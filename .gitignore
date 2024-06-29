@@ -1,6 +1,9 @@
 # Binaries from `make build`
 bin/
 
+# Terraform metadata
+.terraform/
+
 # https://github.com/tmknom/makefiles
 .makefiles/
 
