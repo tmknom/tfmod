@@ -7,14 +7,14 @@ import (
 )
 
 type Parser struct {
-	Mapping map[string][]string
 	BaseDir
+	Store
 }
 
-func NewParser(baseDir BaseDir) *Parser {
+func NewParser(baseDir BaseDir, store Store) *Parser {
 	return &Parser{
-		Mapping: make(map[string][]string, 64),
 		BaseDir: baseDir,
+		Store:   store,
 	}
 }
 
@@ -33,7 +33,7 @@ func (p *Parser) ParseAll(tfDirs TfDirs) error {
 	return nil
 }
 
-func (p *Parser) parse(tfDir string, raw []byte) error {
+func (p *Parser) parse(tfDir TfDir, raw []byte) error {
 	var modulesJson ModulesJson
 
 	err := json.Unmarshal(raw, &modulesJson)
@@ -46,22 +46,22 @@ func (p *Parser) parse(tfDir string, raw []byte) error {
 			continue
 		}
 
-		absModulePath, err := filepath.Abs(filepath.Join(tfDir, module.Dir))
+		absModuleDir, err := filepath.Abs(filepath.Join(tfDir, module.Dir))
 		if err != nil {
 			return err
 		}
 
-		relModulePath, err := filepath.Rel(p.BaseDir, absModulePath)
+		relModuleDir, err := filepath.Rel(p.BaseDir.String(), absModuleDir)
 		if err != nil {
 			return err
 		}
 
-		relTfPath, err := filepath.Rel(p.BaseDir, tfDir)
+		relTfDir, err := filepath.Rel(p.BaseDir.String(), tfDir)
 		if err != nil {
 			return err
 		}
 
-		p.Mapping[relModulePath] = append(p.Mapping[relModulePath], relTfPath)
+		p.Store.Save(relModuleDir, relTfDir)
 	}
 
 	return nil
