@@ -41,6 +41,6 @@ func (d *Dependencies) Run() error {
 	}
 
 	dumped := d.Store.Dump()
-	_, err = fmt.Fprintln(d.IO.OutWriter, dumped.ToJson())
+	_, err = fmt.Fprintln(d.IO.OutWriter, dumped.String())
 	return err
 }

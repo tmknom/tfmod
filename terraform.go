@@ -15,8 +15,8 @@ func NewTerraform(io *IO) *Terraform {
 	}
 }
 
-func (t *Terraform) ExecuteGetAll(dirs TfDirs) error {
-	for dir := range dirs {
+func (t *Terraform) ExecuteGetAll(dirs *TfDirs) error {
+	for _, dir := range dirs.List() {
 		err := t.executeGet(dir)
 		if err != nil {
 			return err

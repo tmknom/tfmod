@@ -18,8 +18,8 @@ func NewParser(baseDir BaseDir, store Store) *Parser {
 	}
 }
 
-func (p *Parser) ParseAll(tfDirs TfDirs) error {
-	for tfDir := range tfDirs {
+func (p *Parser) ParseAll(tfDirs *TfDirs) error {
+	for _, tfDir := range tfDirs.List() {
 		raw, err := os.ReadFile(filepath.Join(tfDir, ModulesPath))
 		if err != nil {
 			return err
