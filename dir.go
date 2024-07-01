@@ -62,8 +62,12 @@ func (d *TfDirs) String() string {
 	return strings.Join(d.SortedSlice(), " ")
 }
 
+func (d *TfDirs) MarshalJSON() ([]byte, error) {
+	return json.Marshal(d.SortedSlice())
+}
+
 func (d *TfDirs) ToJson() string {
-	return SimpleJsonMarshal(d.SortedSlice())
+	return SimpleJsonMarshal(d)
 }
 
 type DependentMap map[ModuleDir][]TfDir
