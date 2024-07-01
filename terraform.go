@@ -15,9 +15,9 @@ func NewTerraform(io *IO) *Terraform {
 	}
 }
 
-func (t *Terraform) RunGetAll(dirs TfDirs) error {
+func (t *Terraform) ExecuteGetAll(dirs TfDirs) error {
 	for dir := range dirs {
-		err := t.runGet(dir)
+		err := t.executeGet(dir)
 		if err != nil {
 			return err
 		}
@@ -25,16 +25,17 @@ func (t *Terraform) RunGetAll(dirs TfDirs) error {
 	return nil
 }
 
-func (t *Terraform) runGet(dir string) error {
+func (t *Terraform) executeGet(dir string) error {
 	if SuppressTerraform {
 		return nil
 	}
 
-	log.Printf("terraform get: %s\n", dir)
 	cmd := exec.Command("terraform", "get")
 	cmd.Dir = dir
 	cmd.Stdout = t.OutWriter
 	cmd.Stderr = t.ErrWriter
+
+	log.Printf("execute: %s (at %s)\n", cmd.String(), cmd.Dir)
 	return cmd.Run()
 }
 

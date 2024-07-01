@@ -5,28 +5,30 @@ import (
 	"log"
 )
 
-type Dependencies struct {
+type Dependents struct {
+	SliceSourceDirs []string
 	Store
 	BaseDir
 	*IO
 }
 
-func NewDependencies(baseDir BaseDir, io *IO) *Dependencies {
-	return &Dependencies{
+func NewDependents(baseDir BaseDir, io *IO) *Dependents {
+	return &Dependents{
 		Store:   NewStore(),
 		BaseDir: baseDir,
 		IO:      io,
 	}
 }
 
-func (d *Dependencies) Run() error {
+func (d *Dependents) Run() error {
+	log.Printf("Source Dirs: %v", d.SliceSourceDirs)
 	log.Printf("BaseDir: %s", d.BaseDir)
 
 	tfDirs, err := d.BaseDir.ListTfDirs()
 	if err != nil {
 		return err
 	}
-	log.Printf("Terraform Directories: %v", tfDirs)
+	log.Printf("Terraform Dirs: %s", tfDirs.String())
 
 	terraform := NewTerraform(d.IO)
 	err = terraform.ExecuteGetAll(tfDirs)
@@ -40,7 +42,9 @@ func (d *Dependencies) Run() error {
 		return err
 	}
 
-	dumped := d.Store.Dump()
-	_, err = fmt.Fprintln(d.IO.OutWriter, dumped.ToJson())
-	return err
+	sourceDirs := NewSourceDirs(d.SliceSourceDirs)
+	result := d.Store.List(sourceDirs)
+	_, err = fmt.Fprintln(d.IO.OutWriter, result.ToJson())
+
+	return nil
 }
