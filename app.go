@@ -53,10 +53,7 @@ func (a *App) newDependenciesCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "dependencies",
 		Short: "List module dependencies",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			log.Printf("start: %s", cmd.Name())
-			return runner.Run()
-		},
+		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
 	}
 	return command
 }
@@ -67,10 +64,7 @@ func (a *App) newDependentsCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "dependents",
 		Short: "List module dependents",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			log.Printf("start: %s", cmd.Name())
-			return runner.Run()
-		},
+		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
 	}
 	command.PersistentFlags().StringSliceVarP(&runner.SliceSourceDirs, "sources", "s", []string{}, "source dirs")
 	return command
@@ -88,17 +82,21 @@ func (a *App) prepareCommand(args []string) {
 	a.rootCmd.SetErr(a.IO.ErrWriter)
 
 	// setup log
-	cobra.OnInitialize(func() { a.setupLog(args) })
+	//cobra.OnInitialize(func() { a.setupLog(args) })
+	a.rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		a.setupLog(cmd.Name(), args)
+	}
 
 	// setup version option
 	version := fmt.Sprintf("%s version %s (%s)", a.Ldflags.Name, a.Ldflags.Version, a.Ldflags.Date)
 	a.rootCmd.SetVersionTemplate(version)
 }
 
-func (a *App) setupLog(args []string) {
+func (a *App) setupLog(name string, args []string) {
 	//log.SetOutput(io.Discard)
 	log.SetOutput(os.Stderr)
 	log.SetPrefix(fmt.Sprintf("[%s] ", a.Ldflags.Name))
-	log.Printf("args: %q", args)
-	log.Printf("ldflags: %+v", a.Ldflags)
+	log.Printf("Start: %s", name)
+	log.Printf("Args: %q", args)
+	log.Printf("Ldflags: %+v", a.Ldflags)
 }
