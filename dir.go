@@ -23,7 +23,11 @@ func (d *BaseDir) ListTfDirs() (*TfDirs, error) {
 			return err
 		}
 		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".tf" {
-			tfDirs.Add(filepath.Dir(path))
+			relPath, err := filepath.Rel(d.String(), path)
+			if err != nil {
+				return err
+			}
+			tfDirs.Add(filepath.Dir(relPath))
 		}
 		return nil
 	})
