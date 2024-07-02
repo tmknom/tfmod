@@ -25,7 +25,7 @@ func (p *Parser) ParseAll(tfDirs *TfDirs) error {
 			return err
 		}
 
-		err = p.parse(tfDir, raw)
+		err = p.Parse(tfDir, raw)
 		if err != nil {
 			return err
 		}
@@ -33,7 +33,7 @@ func (p *Parser) ParseAll(tfDirs *TfDirs) error {
 	return nil
 }
 
-func (p *Parser) parse(tfDir TfDir, raw []byte) error {
+func (p *Parser) Parse(tfDir TfDir, raw []byte) error {
 	var modulesJson ModulesJson
 
 	err := json.Unmarshal(raw, &modulesJson)
@@ -56,12 +56,7 @@ func (p *Parser) parse(tfDir TfDir, raw []byte) error {
 			return err
 		}
 
-		relTfDir, err := filepath.Rel(p.BaseDir.String(), tfDir)
-		if err != nil {
-			return err
-		}
-
-		p.Store.Save(relModuleDir, relTfDir)
+		p.Store.Save(relModuleDir, tfDir)
 	}
 
 	return nil
