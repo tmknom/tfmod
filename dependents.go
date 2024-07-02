@@ -21,27 +21,12 @@ func NewDependents(baseDir BaseDir, io *IO) *Dependents {
 }
 
 func (d *Dependents) Run() error {
+	err := NewLoader(d.Store, d.BaseDir, d.IO).Load()
+	if err != nil {
+		return err
+	}
+
 	log.Printf("Source Dirs: %v", d.SliceSourceDirs)
-	log.Printf("BaseDir: %s", d.BaseDir)
-
-	tfDirs, err := d.BaseDir.ListTfDirs()
-	if err != nil {
-		return err
-	}
-	log.Printf("Terraform Dirs: %s", tfDirs.String())
-
-	terraform := NewTerraform(d.IO)
-	err = terraform.ExecuteGetAll(tfDirs)
-	if err != nil {
-		return err
-	}
-
-	parser := NewParser(d.BaseDir, d.Store)
-	err = parser.ParseAll(tfDirs)
-	if err != nil {
-		return err
-	}
-
 	sourceDirs := NewSourceDirs(d.SliceSourceDirs)
 	result := d.Store.List(sourceDirs)
 	_, err = fmt.Fprintln(d.IO.OutWriter, result.ToJson())
