@@ -25,7 +25,8 @@ func TestAppRunWithDependencies(t *testing.T) {
 		}
 
 		expectedStrings := []string{
-			"\"testdata/terraform/module/bar\":[\"testdata/terraform/env/prd\"]",
+			"testdata/terraform/module/bar:testdata/terraform/env/prd",
+			//"\"testdata/terraform/module/bar\":[\"testdata/terraform/env/prd\"]",
 			//"\"testdata/terraform/module/baz\":[\"testdata/terraform/module/bar\",\"testdata/terraform/env/prd\"]",
 			//"\"testdata/terraform/module/foo\":[\"testdata/terraform/env/dev\",\"testdata/terraform/env/prd\",\"testdata/terraform/env/stg\"]",
 		}
