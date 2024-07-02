@@ -5,6 +5,8 @@ import (
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestParser_Parse(t *testing.T) {
@@ -38,9 +40,9 @@ func TestParser_Parse(t *testing.T) {
 		t.Fatalf("unexpected error: %s", err.Error())
 	}
 
-	expected := "module/bar:env/dev,module/foo:env/dev"
-	if store.Actual() != expected {
-		t.Errorf("expected: %s, actual: %s", expected, store.Actual())
+	expected := []string{"module/bar:env/dev", "module/foo:env/dev"}
+	if diff := cmp.Diff(expected, store.Actual()); diff != "" {
+		t.Errorf("expected: %v, actual: %v", expected, store.Actual())
 	}
 }
 
@@ -48,9 +50,9 @@ type ParserFakeStore struct {
 	list []string
 }
 
-func (s *ParserFakeStore) Actual() string {
+func (s *ParserFakeStore) Actual() []string {
 	sort.Strings(s.list)
-	return strings.Join(s.list, ",")
+	return s.list
 }
 
 func (s *ParserFakeStore) Save(moduleDir ModuleDir, tfDir TfDir) {
