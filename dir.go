@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -13,12 +14,29 @@ import (
 type BaseDir string
 
 func (d *BaseDir) String() string {
-	return string(*d)
+	return d.Abs()
+}
+
+func (d *BaseDir) Abs() string {
+	dir := string(*d)
+	if len(dir) > 0 && dir[0] != '/' {
+		currentDir, err := os.Getwd()
+		if err != nil {
+			log.Fatalln("invalid current directory:", err)
+		}
+		dir = filepath.Join(currentDir, dir)
+	}
+
+	result, err := filepath.Abs(dir)
+	if err != nil {
+		log.Fatalln("invalid base dir:", err)
+	}
+	return result
 }
 
 func (d *BaseDir) ListTfDirs() (*TfDirs, error) {
 	tfDirs := NewTfDirs()
-	err := filepath.WalkDir(d.String(), func(path string, entry fs.DirEntry, err error) error {
+	err := filepath.WalkDir(d.Abs(), func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -59,6 +77,14 @@ func (d *TfDirs) Add(tfDir TfDir) {
 	d.set[tfDir] = true
 }
 
+func (d *TfDirs) AbsList(baseDir BaseDir) []TfDir {
+	result := make([]TfDir, 0, len(d.List()))
+	for _, dir := range d.List() {
+		result = append(result, filepath.Join(baseDir.Abs(), dir))
+	}
+	return result
+}
+
 func (d *TfDirs) List() []TfDir {
 	if d.list != nil {
 		return d.list
@@ -67,9 +93,9 @@ func (d *TfDirs) List() []TfDir {
 }
 
 func (d *TfDirs) generateList() []TfDir {
-	result := make([]string, 0, len(d.set))
-	for v := range d.set {
-		result = append(result, v)
+	result := make([]TfDir, 0, len(d.set))
+	for dir := range d.set {
+		result = append(result, dir)
 	}
 	sort.Strings(result)
 	d.list = result
