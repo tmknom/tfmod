@@ -86,10 +86,7 @@ func (a *App) prepareCommand(args []string) {
 	a.rootCmd.SetErr(a.IO.ErrWriter)
 
 	// setup log
-	//cobra.OnInitialize(func() { a.setupLog(args) })
-	a.rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
-		a.setupLog(cmd.Name(), args)
-	}
+	cobra.OnInitialize(func() { a.setupLog(a.rootCmd.Name(), args) })
 
 	// setup version option
 	version := fmt.Sprintf("%s version %s (%s)", a.Ldflags.Name, a.Ldflags.Version, a.Ldflags.Date)
