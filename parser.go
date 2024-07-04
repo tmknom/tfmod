@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"sort"
 )
 
 type Parser struct {
@@ -25,22 +26,27 @@ func (p *Parser) ParseAll(tfDirs *TfDirs) error {
 			return err
 		}
 
-		err = p.Parse(tfDir, raw)
+		moduleDirs, err := p.Parse(tfDir, raw)
 		if err != nil {
 			return err
+		}
+
+		for _, moduleDir := range moduleDirs {
+			p.Store.Save(moduleDir, tfDir)
 		}
 	}
 	return nil
 }
 
-func (p *Parser) Parse(tfDir TfDir, raw []byte) error {
+func (p *Parser) Parse(tfDir TfDir, raw []byte) ([]ModuleDir, error) {
 	var modulesJson ModulesJson
 
 	err := json.Unmarshal(raw, &modulesJson)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
+	result := make([]ModuleDir, 0, len(modulesJson.Modules))
 	for _, module := range modulesJson.Modules {
 		if module.Dir == "." {
 			continue
@@ -48,18 +54,19 @@ func (p *Parser) Parse(tfDir TfDir, raw []byte) error {
 
 		absModuleDir, err := filepath.Abs(filepath.Join(tfDir, module.Dir))
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		relModuleDir, err := filepath.Rel(p.BaseDir.String(), absModuleDir)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
-		p.Store.Save(relModuleDir, tfDir)
+		result = append(result, relModuleDir)
 	}
 
-	return nil
+	sort.Strings(result)
+	return result, nil
 }
 
 type Module struct {
