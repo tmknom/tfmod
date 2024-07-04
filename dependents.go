@@ -26,15 +26,17 @@ func (d *Dependents) InitBaseDir(dir string) {
 }
 
 func (d *Dependents) Run() error {
+	log.Printf("Source Dirs: %v", d.SliceSourceDirs)
+
 	err := NewLoader(d.Store, d.BaseDir, d.IO).Load()
 	if err != nil {
 		return err
 	}
+	log.Printf("Load DependentMap from: %v", d.BaseDir)
 
-	log.Printf("Source Dirs: %v", d.SliceSourceDirs)
 	sourceDirs := NewSourceDirs(d.SliceSourceDirs)
 	result := d.Store.List(sourceDirs)
+	log.Printf("Write stdout from: %#v", result)
 	_, err = fmt.Fprintln(d.IO.OutWriter, result.ToJson())
-
-	return nil
+	return err
 }

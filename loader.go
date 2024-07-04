@@ -19,25 +19,27 @@ func NewLoader(store Store, baseDir *BaseDir, io *IO) *Loader {
 }
 
 func (l *Loader) Load() error {
-	log.Printf("BaseDir: %s", l.BaseDir)
+	log.Printf("BaseDir: %v", l.BaseDir)
 
 	tfDirs, err := l.BaseDir.ListTfDirs()
 	if err != nil {
 		return err
 	}
-	log.Printf("Terraform Directories: %v", tfDirs)
+	log.Printf("Generate tfdirs from: %v", l.BaseDir)
 
 	terraform := NewTerraform(l.IO)
 	err = terraform.ExecuteGetAll(*l.BaseDir, tfDirs)
 	if err != nil {
 		return err
 	}
+	log.Printf("Execute terraform get to: %v", tfDirs)
 
 	parser := NewParser(l.BaseDir, l.Store)
 	err = parser.ParseAll(tfDirs)
 	if err != nil {
 		return err
 	}
+	log.Printf("Parse to: %v", tfDirs)
 
 	return nil
 }

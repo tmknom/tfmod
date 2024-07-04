@@ -2,6 +2,7 @@ package tfmod
 
 import (
 	"fmt"
+	"log"
 )
 
 type Dependencies struct {
@@ -23,8 +24,10 @@ func (d *Dependencies) Run() error {
 	if err != nil {
 		return err
 	}
+	log.Printf("Load DependentMap from: %v", d.BaseDir)
 
-	dumped := d.Store.Dump()
-	_, err = fmt.Fprintln(d.IO.OutWriter, dumped.String())
+	result := d.Store.Dump()
+	log.Printf("Write stdout from: %#v", result)
+	_, err = fmt.Fprintln(d.IO.OutWriter, result.String())
 	return err
 }
