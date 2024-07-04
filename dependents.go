@@ -12,11 +12,16 @@ type Dependents struct {
 	*IO
 }
 
-func NewDependents(baseDir BaseDir, io *IO) *Dependents {
+func NewDependents(io *IO) *Dependents {
 	return &Dependents{
-		Store:   NewStore(),
-		BaseDir: baseDir,
-		IO:      io,
+		Store: NewStore(),
+		IO:    io,
+	}
+}
+
+func (d *Dependents) InitBaseDir(dir string) {
+	if len(d.BaseDir) == 0 {
+		d.BaseDir = BaseDir(dir)
 	}
 }
 

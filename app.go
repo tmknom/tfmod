@@ -59,14 +59,18 @@ func (a *App) newDependenciesCommand() *cobra.Command {
 }
 
 func (a *App) newDependentsCommand() *cobra.Command {
-	currentDir, _ := os.Getwd()
-	runner := NewDependents(BaseDir(currentDir), a.IO)
+	var inputBaseDir string
+	runner := NewDependents(a.IO)
 	command := &cobra.Command{
 		Use:   "dependents",
 		Short: "List module dependents",
-		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
+		RunE: func(cmd *cobra.Command, args []string) error {
+			runner.InitBaseDir(inputBaseDir)
+			return runner.Run()
+		},
 	}
 	command.PersistentFlags().StringSliceVarP(&runner.SliceSourceDirs, "sources", "s", []string{}, "source dirs")
+	command.PersistentFlags().StringVarP(&inputBaseDir, "base-dir", "b", ".", "base directory")
 	return command
 }
 
