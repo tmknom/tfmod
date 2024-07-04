@@ -11,14 +11,22 @@ import (
 	"strings"
 )
 
-type BaseDir string
+type BaseDir struct {
+	Raw string
+}
+
+func NewBaseDir(raw string) *BaseDir {
+	return &BaseDir{
+		Raw: raw,
+	}
+}
 
 func (d *BaseDir) String() string {
 	return d.Abs()
 }
 
 func (d *BaseDir) Abs() string {
-	dir := string(*d)
+	dir := d.Raw
 	if len(dir) > 0 && dir[0] != '/' {
 		currentDir, err := os.Getwd()
 		if err != nil {

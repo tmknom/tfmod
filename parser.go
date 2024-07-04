@@ -8,11 +8,11 @@ import (
 )
 
 type Parser struct {
-	BaseDir
+	*BaseDir
 	Store
 }
 
-func NewParser(baseDir BaseDir, store Store) *Parser {
+func NewParser(baseDir *BaseDir, store Store) *Parser {
 	return &Parser{
 		BaseDir: baseDir,
 		Store:   store,
@@ -20,8 +20,8 @@ func NewParser(baseDir BaseDir, store Store) *Parser {
 }
 
 func (p *Parser) ParseAll(tfDirs *TfDirs) error {
-	for _, tfDir := range tfDirs.AbsList(p.BaseDir) {
-		raw, err := os.ReadFile(filepath.Join(tfDir, ModulesPath))
+	for _, tfDir := range tfDirs.List() {
+		raw, err := os.ReadFile(filepath.Join(p.BaseDir.Abs(), tfDir, ModulesPath))
 		if err != nil {
 			return err
 		}
@@ -52,12 +52,12 @@ func (p *Parser) Parse(tfDir TfDir, raw []byte) ([]ModuleDir, error) {
 			continue
 		}
 
-		absModuleDir, err := filepath.Abs(filepath.Join(tfDir, module.Dir))
+		absModuleDir, err := filepath.Abs(filepath.Join(p.BaseDir.Abs(), tfDir, module.Dir))
 		if err != nil {
 			return nil, err
 		}
 
-		relModuleDir, err := filepath.Rel(p.BaseDir.String(), absModuleDir)
+		relModuleDir, err := filepath.Rel(p.BaseDir.Abs(), absModuleDir)
 		if err != nil {
 			return nil, err
 		}

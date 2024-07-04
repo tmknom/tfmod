@@ -6,11 +6,11 @@ import (
 
 type Loader struct {
 	Store
-	BaseDir
+	*BaseDir
 	*IO
 }
 
-func NewLoader(store Store, baseDir BaseDir, io *IO) *Loader {
+func NewLoader(store Store, baseDir *BaseDir, io *IO) *Loader {
 	return &Loader{
 		Store:   store,
 		BaseDir: baseDir,

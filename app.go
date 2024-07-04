@@ -49,7 +49,7 @@ func (a *App) Run(args []string) error {
 
 func (a *App) newDependenciesCommand() *cobra.Command {
 	currentDir, _ := os.Getwd()
-	runner := NewDependencies(BaseDir(currentDir), a.IO)
+	runner := NewDependencies(NewBaseDir(currentDir), a.IO)
 	command := &cobra.Command{
 		Use:   "dependencies",
 		Short: "List module dependencies",
