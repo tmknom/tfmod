@@ -35,14 +35,14 @@ func TestParser_Parse(t *testing.T) {
 }
 `
 
-	err := parser.Parse("env/dev", []byte(moduleJson))
+	actual, err := parser.Parse("env/dev", []byte(moduleJson))
 	if err != nil {
-		t.Fatalf("unexpected error: %s", err.Error())
+		t.Fatalf("unexpected error: %v", err)
 	}
 
-	expected := []string{"module/bar:env/dev", "module/foo:env/dev"}
-	if diff := cmp.Diff(expected, store.Actual()); diff != "" {
-		t.Errorf("expected: %v, actual: %v", expected, store.Actual())
+	expected := []string{"module/bar", "module/foo"}
+	if diff := cmp.Diff(expected, actual); diff != "" {
+		t.Errorf("expected: %v, actual: %v", expected, actual)
 	}
 }
 
