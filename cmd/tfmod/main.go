@@ -19,7 +19,7 @@ var (
 func main() {
 	app := createApp()
 	if err := app.Run(os.Args[1:]); err != nil {
-		log.Fatalf("%s", err.Error())
+		log.Fatalf("%+v", err)
 	}
 }
 
