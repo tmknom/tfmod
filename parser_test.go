@@ -12,7 +12,7 @@ import (
 func TestParser_Parse(t *testing.T) {
 	store := &ParserFakeStore{}
 	currentDir, _ := os.Getwd()
-	parser := NewParser(BaseDir(currentDir), store)
+	parser := NewParser(NewBaseDir(currentDir), store)
 	moduleJson := `
 {
   "Modules": [

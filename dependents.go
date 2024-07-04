@@ -8,7 +8,7 @@ import (
 type Dependents struct {
 	SliceSourceDirs []string
 	Store
-	BaseDir
+	*BaseDir
 	*IO
 }
 
@@ -20,8 +20,8 @@ func NewDependents(io *IO) *Dependents {
 }
 
 func (d *Dependents) InitBaseDir(dir string) {
-	if len(d.BaseDir) == 0 {
-		d.BaseDir = BaseDir(dir)
+	if d.BaseDir == nil {
+		d.BaseDir = NewBaseDir(dir)
 	}
 }
 

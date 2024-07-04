@@ -6,11 +6,11 @@ import (
 
 type Dependencies struct {
 	Store
-	BaseDir
+	*BaseDir
 	*IO
 }
 
-func NewDependencies(baseDir BaseDir, io *IO) *Dependencies {
+func NewDependencies(baseDir *BaseDir, io *IO) *Dependencies {
 	return &Dependencies{
 		Store:   NewStore(),
 		BaseDir: baseDir,
