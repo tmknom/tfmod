@@ -10,7 +10,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/cockroachdb/errors"
+	"github.com/tmknom/tfmod/internal/errlib"
 )
 
 type BaseDir struct {
@@ -48,12 +48,12 @@ func (d *BaseDir) ListTfDirs() (*TfDirs, error) {
 	tfDirs := NewTfDirs()
 	err := filepath.WalkDir(d.Abs(), func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
-			return errors.Wrapf(err, "invalid base dir: %#v", d)
+			return errlib.Wrapf(err, "invalid base dir: %#v", d)
 		}
 		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".tf" {
 			relPath, err := filepath.Rel(d.Abs(), path)
 			if err != nil {
-				return errors.Wrapf(err, "invalid base dir: %#v", d)
+				return errlib.Wrapf(err, "invalid base dir: %#v", d)
 			}
 			tfDirs.Add(filepath.Dir(relPath))
 		}
