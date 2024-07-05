@@ -4,7 +4,7 @@ import "log"
 
 type Store interface {
 	Save(moduleDir ModuleDir, tfDir TfDir)
-	List(sourceDirs SourceDirs) *TfDirs
+	List(moduleDirs []string) *TfDirs
 	ListModuleDirs(stateDirs []string) *ModuleDirs
 	Dump()
 }
@@ -26,10 +26,10 @@ func (s *InMemoryStore) Save(moduleDir ModuleDir, tfDir TfDir) {
 	s.DependentMap.Add(moduleDir, tfDir)
 }
 
-func (s *InMemoryStore) List(sourceDirs SourceDirs) *TfDirs {
+func (s *InMemoryStore) List(moduleDirs []string) *TfDirs {
 	result := NewTfDirs()
 
-	for _, sourceDir := range sourceDirs {
+	for _, sourceDir := range moduleDirs {
 		tfDirs := s.DependentMap.ListTfDirSlice(sourceDir)
 		for _, tfDir := range tfDirs {
 			if !s.DependentMap.IsModule(tfDir) {

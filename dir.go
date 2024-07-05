@@ -66,12 +66,6 @@ type TfDir = string
 type ModuleDir = string
 type SourceDir = string
 
-type SourceDirs []SourceDir
-
-func NewSourceDirs(inputs []string) SourceDirs {
-	return inputs
-}
-
 type ModuleDirs struct {
 	set  map[ModuleDir]bool
 	list []ModuleDir

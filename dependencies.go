@@ -37,8 +37,7 @@ func (d *Dependencies) Run() error {
 	if err != nil {
 		return err
 	}
-	log.Printf("Load DependentMap from: %v", d.flags.BaseDir())
-
+	log.Printf("Load from: %v", d.flags.BaseDir())
 	d.Store.Dump()
 
 	result := d.Store.ListModuleDirs(d.flags.StateDirs)
