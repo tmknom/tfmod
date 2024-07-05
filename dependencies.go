@@ -20,6 +20,7 @@ func NewDependencies(flags *DependenciesFlags, store Store, io *IO) *Dependencie
 }
 
 type DependenciesFlags struct {
+	StateDirs []string
 	*GlobalFlags
 }
 
@@ -38,8 +39,10 @@ func (d *Dependencies) Run() error {
 	}
 	log.Printf("Load DependentMap from: %v", d.flags.BaseDir())
 
-	result := d.Store.Dump()
+	d.Store.Dump()
+
+	result := d.Store.ListModuleDirs(d.flags.StateDirs)
 	log.Printf("Write stdout from: %#v", result)
-	_, err = fmt.Fprintln(d.IO.OutWriter, result.String())
+	_, err = fmt.Fprintln(d.IO.OutWriter, result.ToJson())
 	return err
 }

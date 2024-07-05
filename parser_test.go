@@ -64,6 +64,8 @@ func (s *ParserFakeStore) List(sourceDirs SourceDirs) *TfDirs {
 	return nil
 }
 
-func (s *ParserFakeStore) Dump() *DependentMap {
+func (s *ParserFakeStore) ListModuleDirs(stateDirs []string) *ModuleDirs {
 	return nil
 }
+
+func (s *ParserFakeStore) Dump() {}
