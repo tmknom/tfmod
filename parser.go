@@ -46,7 +46,7 @@ func (p *Parser) Parse(sourceDir *SourceDir, raw []byte) ([]*ModuleDir, error) {
 		return nil, errlib.Wrapf(err, "invalid json: %s", string(raw))
 	}
 
-	relModuleDirs := make([]string, 0, len(modulesJson.Modules))
+	relModuleDirs := make([]*ModuleDir, 0, len(modulesJson.Modules))
 	for _, module := range modulesJson.Modules {
 		if module.Dir == "." {
 			continue
@@ -61,15 +61,13 @@ func (p *Parser) Parse(sourceDir *SourceDir, raw []byte) ([]*ModuleDir, error) {
 		if err != nil {
 			return nil, errlib.Wrapf(err, "invalid absolute module dir: %s", absModuleDir)
 		}
-		relModuleDirs = append(relModuleDirs, relModuleDir)
+		relModuleDirs = append(relModuleDirs, NewModuleDir(relModuleDir, sourceDir.baseDir))
 	}
 
-	sort.Strings(relModuleDirs)
-	result := make([]*ModuleDir, 0, len(relModuleDirs))
-	for _, dir := range relModuleDirs {
-		result = append(result, NewModuleDir(dir, sourceDir.baseDir))
-	}
-	return result, nil
+	sort.Slice(relModuleDirs, func(i, j int) bool {
+		return relModuleDirs[i].Rel() < relModuleDirs[j].Rel()
+	})
+	return relModuleDirs, nil
 }
 
 type Module struct {
