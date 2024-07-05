@@ -10,7 +10,7 @@ type InMemoryStore struct {
 	*DependentMap
 }
 
-func NewStore() *InMemoryStore {
+func NewInMemoryStore() *InMemoryStore {
 	return &InMemoryStore{
 		DependentMap: NewDependentMap(),
 	}

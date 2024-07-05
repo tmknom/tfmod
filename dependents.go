@@ -6,35 +6,40 @@ import (
 )
 
 type Dependents struct {
-	SliceSourceDirs []string
+	flags *DependentsFlags
 	Store
-	*BaseDir
 	*IO
 }
 
-func NewDependents(io *IO) *Dependents {
+func NewDependents(flags *DependentsFlags, store Store, io *IO) *Dependents {
 	return &Dependents{
-		Store: NewStore(),
+		flags: flags,
+		Store: store,
 		IO:    io,
 	}
 }
 
-func (d *Dependents) InitBaseDir(dir string) {
-	if d.BaseDir == nil {
-		d.BaseDir = NewBaseDir(dir)
+type DependentsFlags struct {
+	rawSourceDirs []string
+	*GlobalFlags
+}
+
+func NewDependentsFlags(globalFlags *GlobalFlags) *DependentsFlags {
+	return &DependentsFlags{
+		GlobalFlags: globalFlags,
 	}
 }
 
 func (d *Dependents) Run() error {
-	log.Printf("Source Dirs: %v", d.SliceSourceDirs)
+	log.Printf("Runner flags: %#v", d.flags)
 
-	err := NewLoader(d.Store, d.BaseDir, d.IO).Load()
+	err := NewLoader(d.Store, d.flags.BaseDir(), d.IO).Load()
 	if err != nil {
 		return err
 	}
-	log.Printf("Load DependentMap from: %v", d.BaseDir)
+	log.Printf("Load DependentMap from: %v", d.flags.BaseDir())
 
-	sourceDirs := NewSourceDirs(d.SliceSourceDirs)
+	sourceDirs := NewSourceDirs(d.flags.rawSourceDirs)
 	result := d.Store.List(sourceDirs)
 	log.Printf("Write stdout from: %#v", result)
 	_, err = fmt.Fprintln(d.IO.OutWriter, result.ToJson())
