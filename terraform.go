@@ -15,9 +15,9 @@ func NewTerraform() *Terraform {
 	return &Terraform{}
 }
 
-func (t *Terraform) ExecuteGetAll(baseDir BaseDir, dirs *TfDirs) error {
+func (t *Terraform) ExecuteGetAll(baseDir *BaseDir, dirs *TfDirs, enable bool) error {
 	for _, dir := range dirs.AbsList(baseDir) {
-		err := t.executeGet(dir)
+		err := t.executeGet(dir, enable)
 		if err != nil {
 			return err
 		}
@@ -25,8 +25,8 @@ func (t *Terraform) ExecuteGetAll(baseDir BaseDir, dirs *TfDirs) error {
 	return nil
 }
 
-func (t *Terraform) executeGet(dir string) error {
-	if SuppressTerraform {
+func (t *Terraform) executeGet(dir string, enable bool) error {
+	if !enable {
 		return nil
 	}
 
@@ -46,6 +46,5 @@ func (t *Terraform) executeGet(dir string) error {
 }
 
 const (
-	ModulesPath       = ".terraform/modules/modules.json"
-	SuppressTerraform = true
+	ModulesPath = ".terraform/modules/modules.json"
 )

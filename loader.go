@@ -7,14 +7,14 @@ import (
 type Loader struct {
 	Store
 	*BaseDir
-	*IO
+	enableTf bool
 }
 
-func NewLoader(store Store, baseDir *BaseDir, io *IO) *Loader {
+func NewLoader(store Store, baseDir *BaseDir, enableTf bool) *Loader {
 	return &Loader{
-		Store:   store,
-		BaseDir: baseDir,
-		IO:      io,
+		Store:    store,
+		BaseDir:  baseDir,
+		enableTf: enableTf,
 	}
 }
 
@@ -28,7 +28,7 @@ func (l *Loader) Load() error {
 	log.Printf("Generate tfdirs from: %v", l.BaseDir)
 
 	terraform := NewTerraform()
-	err = terraform.ExecuteGetAll(*l.BaseDir, tfDirs)
+	err = terraform.ExecuteGetAll(l.BaseDir, tfDirs, l.enableTf)
 	if err != nil {
 		return err
 	}

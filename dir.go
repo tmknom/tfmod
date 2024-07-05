@@ -87,7 +87,7 @@ func (d *TfDirs) Add(tfDir TfDir) {
 	d.set[tfDir] = true
 }
 
-func (d *TfDirs) AbsList(baseDir BaseDir) []TfDir {
+func (d *TfDirs) AbsList(baseDir *BaseDir) []TfDir {
 	result := make([]TfDir, 0, len(d.List()))
 	for _, dir := range d.List() {
 		result = append(result, filepath.Join(baseDir.Abs(), dir))
