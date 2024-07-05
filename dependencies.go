@@ -6,25 +6,37 @@ import (
 )
 
 type Dependencies struct {
+	flags *DependenciesFlags
 	Store
-	*BaseDir
 	*IO
 }
 
-func NewDependencies(baseDir *BaseDir, io *IO) *Dependencies {
+func NewDependencies(flags *DependenciesFlags, store Store, io *IO) *Dependencies {
 	return &Dependencies{
-		Store:   NewStore(),
-		BaseDir: baseDir,
-		IO:      io,
+		flags: flags,
+		Store: store,
+		IO:    io,
+	}
+}
+
+type DependenciesFlags struct {
+	*GlobalFlags
+}
+
+func NewDependenciesFlags(globalFlags *GlobalFlags) *DependenciesFlags {
+	return &DependenciesFlags{
+		GlobalFlags: globalFlags,
 	}
 }
 
 func (d *Dependencies) Run() error {
-	err := NewLoader(d.Store, d.BaseDir, d.IO).Load()
+	log.Printf("Runner flags: %#v", d.flags)
+
+	err := NewLoader(d.Store, d.flags.BaseDir(), d.IO).Load()
 	if err != nil {
 		return err
 	}
-	log.Printf("Load DependentMap from: %v", d.BaseDir)
+	log.Printf("Load DependentMap from: %v", d.flags.BaseDir())
 
 	result := d.Store.Dump()
 	log.Printf("Write stdout from: %#v", result)
