@@ -30,6 +30,10 @@ func NewDependentsFlags(globalFlags *GlobalFlags) *DependentsFlags {
 	}
 }
 
+func (f *DependentsFlags) GoString() string {
+	return fmt.Sprintf("%#v", *f)
+}
+
 func (d *Dependents) Run() error {
 	log.Printf("Runner flags: %#v", d.flags)
 
