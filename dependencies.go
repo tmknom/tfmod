@@ -37,7 +37,7 @@ func (f *DependenciesFlags) GoString() string {
 func (d *Dependencies) Run() error {
 	log.Printf("Runner flags: %#v", d.flags)
 
-	err := NewLoader(d.Store, d.flags.GlobalFlags.BaseDir(), d.flags.GlobalFlags.EnableTf).Load()
+	err := NewLoader(d.Store, d.flags.BaseDir(), d.flags.EnableTf).Load()
 	if err != nil {
 		return err
 	}

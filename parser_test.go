@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	_ "github.com/google/go-cmp/cmp"
+	"github.com/tmknom/tfmod/internal/dir"
 )
 
 func TestParser_Parse(t *testing.T) {
@@ -35,7 +35,7 @@ func TestParser_Parse(t *testing.T) {
 `
 
 	currentDir, _ := os.Getwd()
-	baseDir := NewBaseDir(currentDir)
+	baseDir := dir.NewBaseDir(currentDir)
 	actual, err := parser.Parse(NewSourceDir("env/dev", baseDir), []byte(moduleJson))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -47,10 +47,6 @@ func TestParser_Parse(t *testing.T) {
 			t.Errorf("expected: %v, actual: %v", expected, actual)
 		}
 	}
-	//if diff := cmp.Diff(expected, actual); diff != "" {
-	//	t.Errorf("expected: %v, actual: %v", expected, actual)
-	//}
-	//t.Errorf("expected: %v, actual: %v", expected, actual)
 }
 
 type ParserFakeStore struct {
@@ -67,11 +63,11 @@ func (s *ParserFakeStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
 	s.list = append(s.list, pair)
 }
 
-func (s *ParserFakeStore) List(moduleDirs []string) *TfDirs {
+func (s *ParserFakeStore) ListTfDirs(moduleDirs []string) *Dirs {
 	return nil
 }
 
-func (s *ParserFakeStore) ListModuleDirs(stateDirs []string) *ModuleDirs {
+func (s *ParserFakeStore) ListModuleDirs(stateDirs []string) *Dirs {
 	return nil
 }
 

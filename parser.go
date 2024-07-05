@@ -51,17 +51,8 @@ func (p *Parser) Parse(sourceDir *SourceDir, raw []byte) ([]*ModuleDir, error) {
 		if module.Dir == "." {
 			continue
 		}
-
-		absModuleDir, err := filepath.Abs(filepath.Join(sourceDir.Abs(), module.Dir))
-		if err != nil {
-			return nil, errlib.Wrapf(err, "invalid json at Modules.Dir: %s", module.Dir)
-		}
-
-		relModuleDir, err := filepath.Rel(sourceDir.AbsBaseDir(), absModuleDir)
-		if err != nil {
-			return nil, errlib.Wrapf(err, "invalid absolute module dir: %s", absModuleDir)
-		}
-		relModuleDirs = append(relModuleDirs, NewModuleDir(relModuleDir, sourceDir.baseDir))
+		moduleDir := NewModuleDir(filepath.Join(sourceDir.Abs(), module.Dir), sourceDir.BaseDir())
+		relModuleDirs = append(relModuleDirs, moduleDir)
 	}
 
 	sort.Slice(relModuleDirs, func(i, j int) bool {

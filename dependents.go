@@ -37,14 +37,14 @@ func (f *DependentsFlags) GoString() string {
 func (d *Dependents) Run() error {
 	log.Printf("Runner flags: %#v", d.flags)
 
-	err := NewLoader(d.Store, d.flags.GlobalFlags.BaseDir(), d.flags.GlobalFlags.EnableTf).Load()
+	err := NewLoader(d.Store, d.flags.BaseDir(), d.flags.EnableTf).Load()
 	if err != nil {
 		return err
 	}
 	log.Printf("Load from: %v", d.flags.BaseDir())
 	d.Store.Dump()
 
-	result := d.Store.List(d.flags.ModuleDirs)
+	result := d.Store.ListTfDirs(d.flags.ModuleDirs)
 	log.Printf("Write stdout from: %#v", result)
 	_, err = fmt.Fprintln(d.IO.OutWriter, result.ToJson())
 	return err
