@@ -10,37 +10,35 @@ import (
 )
 
 type Parser struct {
-	*BaseDir
 	Store
 }
 
 func NewParser(baseDir *BaseDir, store Store) *Parser {
 	return &Parser{
-		BaseDir: baseDir,
-		Store:   store,
+		Store: store,
 	}
 }
 
-func (p *Parser) ParseAll(tfDirs *TfDirs) error {
-	for _, tfDir := range tfDirs.List() {
-		raw, err := os.ReadFile(filepath.Join(p.BaseDir.Abs(), tfDir, ModulesPath))
+func (p *Parser) ParseAll(sourceDirs []*SourceDir) error {
+	for _, sourceDir := range sourceDirs {
+		raw, err := os.ReadFile(filepath.Join(sourceDir.Abs(), ModulesPath))
 		if err != nil {
 			return errlib.Wrapf(err, "not readfile")
 		}
 
-		moduleDirs, err := p.Parse(tfDir, raw)
+		moduleDirs, err := p.Parse(sourceDir, raw)
 		if err != nil {
 			return err
 		}
 
 		for _, moduleDir := range moduleDirs {
-			p.Store.Save(moduleDir, tfDir)
+			p.Store.Save(moduleDir, sourceDir.Rel())
 		}
 	}
 	return nil
 }
 
-func (p *Parser) Parse(tfDir TfDir, raw []byte) ([]ModuleDir, error) {
+func (p *Parser) Parse(sourceDir *SourceDir, raw []byte) ([]ModuleDir, error) {
 	var modulesJson ModulesJson
 
 	err := json.Unmarshal(raw, &modulesJson)
@@ -54,12 +52,12 @@ func (p *Parser) Parse(tfDir TfDir, raw []byte) ([]ModuleDir, error) {
 			continue
 		}
 
-		absModuleDir, err := filepath.Abs(filepath.Join(p.BaseDir.Abs(), tfDir, module.Dir))
+		absModuleDir, err := filepath.Abs(filepath.Join(sourceDir.Abs(), module.Dir))
 		if err != nil {
 			return nil, errlib.Wrapf(err, "invalid json at Modules.Dir: %s", module.Dir)
 		}
 
-		relModuleDir, err := filepath.Rel(p.BaseDir.Abs(), absModuleDir)
+		relModuleDir, err := filepath.Rel(sourceDir.AbsBaseDir(), absModuleDir)
 		if err != nil {
 			return nil, errlib.Wrapf(err, "invalid absolute module dir: %s", absModuleDir)
 		}
