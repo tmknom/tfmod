@@ -32,7 +32,7 @@ func NewDependenciesFlags(globalFlags *GlobalFlags) *DependenciesFlags {
 func (d *Dependencies) Run() error {
 	log.Printf("Runner flags: %#v", d.flags)
 
-	err := NewLoader(d.Store, d.flags.BaseDir(), d.IO).Load()
+	err := NewLoader(d.Store, d.flags.GlobalFlags.BaseDir(), d.flags.GlobalFlags.EnableTf).Load()
 	if err != nil {
 		return err
 	}

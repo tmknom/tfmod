@@ -45,6 +45,7 @@ func (a *App) Run(args []string) error {
 
 	a.rootCmd.PersistentFlags().BoolVar(&a.GlobalFlags.Debug, "debug", false, "show debugging output")
 	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.InputBaseDir, "base-dir", "b", ".", "base directory")
+	a.rootCmd.PersistentFlags().BoolVar(&a.GlobalFlags.EnableTf, "enable-tf", true, "enable terraform command")
 
 	a.rootCmd.AddCommand(a.newDependenciesCommand())
 	a.rootCmd.AddCommand(a.newDependentsCommand())
@@ -108,6 +109,7 @@ func (a *App) setupLog(name string, args []string) {
 
 type GlobalFlags struct {
 	InputBaseDir string
+	EnableTf     bool
 	Debug        bool
 }
 
