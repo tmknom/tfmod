@@ -20,7 +20,7 @@ func NewDependents(flags *DependentsFlags, store Store, io *IO) *Dependents {
 }
 
 type DependentsFlags struct {
-	rawSourceDirs []string
+	ModuleDirs []string
 	*GlobalFlags
 }
 
@@ -37,10 +37,10 @@ func (d *Dependents) Run() error {
 	if err != nil {
 		return err
 	}
-	log.Printf("Load DependentMap from: %v", d.flags.BaseDir())
+	log.Printf("Load from: %v", d.flags.BaseDir())
+	d.Store.Dump()
 
-	sourceDirs := NewSourceDirs(d.flags.rawSourceDirs)
-	result := d.Store.List(sourceDirs)
+	result := d.Store.List(d.flags.ModuleDirs)
 	log.Printf("Write stdout from: %#v", result)
 	_, err = fmt.Fprintln(d.IO.OutWriter, result.ToJson())
 	return err
