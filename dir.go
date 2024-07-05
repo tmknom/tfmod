@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strings"
 
 	"github.com/tmknom/tfmod/internal/errlib"
 )
@@ -133,47 +132,35 @@ func (d *ModuleDirs) ToJson() string {
 }
 
 type TfDirs struct {
-	set  map[TfDir]bool
-	list []TfDir
+	set  map[string]bool
+	list []string
 }
 
 func NewTfDirs() *TfDirs {
 	return &TfDirs{
-		set: make(map[TfDir]bool, 64),
+		set: make(map[string]bool, 64),
 	}
 }
 
-func (d *TfDirs) Add(tfDir TfDir) {
+func (d *TfDirs) Add(tfDir string) {
 	d.set[tfDir] = true
 }
 
-func (d *TfDirs) AbsList(baseDir *BaseDir) []TfDir {
-	result := make([]TfDir, 0, len(d.List()))
-	for _, dir := range d.List() {
-		result = append(result, filepath.Join(baseDir.Abs(), dir))
-	}
-	return result
-}
-
-func (d *TfDirs) List() []TfDir {
+func (d *TfDirs) List() []string {
 	if d.list != nil {
 		return d.list
 	}
 	return d.generateList()
 }
 
-func (d *TfDirs) generateList() []TfDir {
-	result := make([]TfDir, 0, len(d.set))
+func (d *TfDirs) generateList() []string {
+	result := make([]string, 0, len(d.set))
 	for dir := range d.set {
 		result = append(result, dir)
 	}
 	sort.Strings(result)
 	d.list = result
 	return result
-}
-
-func (d *TfDirs) String() string {
-	return strings.Join(d.List(), " ")
 }
 
 func (d *TfDirs) MarshalJSON() ([]byte, error) {
@@ -185,33 +172,34 @@ func (d *TfDirs) ToJson() string {
 }
 
 type DependentMap struct {
-	set map[ModuleDir][]TfDir
+	set map[string][]*TfDir
 }
 
 func NewDependentMap() *DependentMap {
 	return &DependentMap{
-		set: make(map[ModuleDir][]TfDir, 64),
+		set: make(map[string][]*TfDir, 64),
 	}
 }
 
-func (m *DependentMap) Add(moduleDir ModuleDir, tfDir TfDir) {
-	m.set[moduleDir] = append(m.set[moduleDir], tfDir)
+func (m *DependentMap) Add(moduleDir *ModuleDir, tfDir *TfDir) {
+	key := *moduleDir
+	m.set[key] = append(m.set[key], tfDir)
 }
 
-func (m *DependentMap) ListTfDirSlice(moduleDir ModuleDir) []TfDir {
+func (m *DependentMap) ListTfDirSlice(moduleDir string) []*TfDir {
 	result, _ := m.set[moduleDir]
 	return result
 }
 
-func (m *DependentMap) IsModule(moduleDir ModuleDir) bool {
+func (m *DependentMap) IsModule(moduleDir string) bool {
 	_, ok := m.set[moduleDir]
 	return ok
 }
 
 func (m *DependentMap) String() string {
 	result := ""
-	for k, v := range m.set {
-		result += fmt.Sprintf("%s:%s\n", k, strings.Join(v, " "))
+	for key, value := range m.set {
+		result += fmt.Sprintf("%s:%#v\n", key, value)
 	}
 	return result
 }
@@ -221,33 +209,34 @@ func (m *DependentMap) ToJson() string {
 }
 
 type DependencyMap struct {
-	set map[TfDir][]ModuleDir
+	set map[string][]*ModuleDir
 }
 
 func NewDependencyMap() *DependencyMap {
 	return &DependencyMap{
-		set: make(map[TfDir][]ModuleDir, 64),
+		set: make(map[string][]*ModuleDir, 64),
 	}
 }
 
-func (m *DependencyMap) Add(tfDir TfDir, moduleDir ModuleDir) {
-	m.set[tfDir] = append(m.set[tfDir], moduleDir)
+func (m *DependencyMap) Add(tfDir *TfDir, moduleDir *ModuleDir) {
+	key := *tfDir
+	m.set[key] = append(m.set[key], moduleDir)
 }
 
-func (m *DependencyMap) ListModuleDirSlice(tfDir TfDir) []ModuleDir {
+func (m *DependencyMap) ListModuleDirSlice(tfDir string) []*ModuleDir {
 	result, _ := m.set[tfDir]
 	return result
 }
 
-func (m *DependencyMap) IsTf(tfDir TfDir) bool {
+func (m *DependencyMap) IsTf(tfDir string) bool {
 	_, ok := m.set[tfDir]
 	return ok
 }
 
 func (m *DependencyMap) String() string {
 	result := ""
-	for k, v := range m.set {
-		result += fmt.Sprintf("%s:%s\n", k, strings.Join(v, " "))
+	for key, value := range m.set {
+		result += fmt.Sprintf("%s:%#v\n", key, value)
 	}
 	return result
 }

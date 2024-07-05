@@ -22,8 +22,8 @@ func NewInMemoryStore() *InMemoryStore {
 }
 
 func (s *InMemoryStore) Save(moduleDir ModuleDir, tfDir TfDir) {
-	s.DependencyMap.Add(tfDir, moduleDir)
-	s.DependentMap.Add(moduleDir, tfDir)
+	s.DependencyMap.Add(&tfDir, &moduleDir)
+	s.DependentMap.Add(&moduleDir, &tfDir)
 }
 
 func (s *InMemoryStore) List(moduleDirs []string) *TfDirs {
@@ -32,8 +32,8 @@ func (s *InMemoryStore) List(moduleDirs []string) *TfDirs {
 	for _, sourceDir := range moduleDirs {
 		tfDirs := s.DependentMap.ListTfDirSlice(sourceDir)
 		for _, tfDir := range tfDirs {
-			if !s.DependentMap.IsModule(tfDir) {
-				result.Add(tfDir)
+			if !s.DependentMap.IsModule(*tfDir) {
+				result.Add(*tfDir)
 			}
 		}
 	}
@@ -50,7 +50,7 @@ func (s *InMemoryStore) ListModuleDirs(stateDirs []string) *ModuleDirs {
 			//if !s.DependencyMap.IsTf(moduleDir) {
 			//	result.Add(moduleDir)
 			//}
-			result.Add(moduleDir)
+			result.Add(*moduleDir)
 		}
 	}
 
