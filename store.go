@@ -1,22 +1,28 @@
 package tfmod
 
+import "log"
+
 type Store interface {
 	Save(moduleDir ModuleDir, tfDir TfDir)
 	List(sourceDirs SourceDirs) *TfDirs
-	Dump() *DependentMap
+	ListModuleDirs(stateDirs []string) *ModuleDirs
+	Dump()
 }
 
 type InMemoryStore struct {
+	*DependencyMap
 	*DependentMap
 }
 
 func NewInMemoryStore() *InMemoryStore {
 	return &InMemoryStore{
-		DependentMap: NewDependentMap(),
+		DependencyMap: NewDependencyMap(),
+		DependentMap:  NewDependentMap(),
 	}
 }
 
 func (s *InMemoryStore) Save(moduleDir ModuleDir, tfDir TfDir) {
+	s.DependencyMap.Add(tfDir, moduleDir)
 	s.DependentMap.Add(moduleDir, tfDir)
 }
 
@@ -35,6 +41,23 @@ func (s *InMemoryStore) List(sourceDirs SourceDirs) *TfDirs {
 	return result
 }
 
-func (s *InMemoryStore) Dump() *DependentMap {
-	return s.DependentMap
+func (s *InMemoryStore) ListModuleDirs(stateDirs []string) *ModuleDirs {
+	result := NewModuleDirs()
+
+	for _, dir := range stateDirs {
+		moduleDirs := s.DependencyMap.ListModuleDirSlice(dir)
+		for _, moduleDir := range moduleDirs {
+			//if !s.DependencyMap.IsTf(moduleDir) {
+			//	result.Add(moduleDir)
+			//}
+			result.Add(moduleDir)
+		}
+	}
+
+	return result
+}
+
+func (s *InMemoryStore) Dump() {
+	log.Printf("DependencyMap: %#v", s.DependencyMap)
+	log.Printf("DependentMap: %#v", s.DependentMap)
 }

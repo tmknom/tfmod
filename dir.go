@@ -72,6 +72,46 @@ func NewSourceDirs(inputs []string) SourceDirs {
 	return inputs
 }
 
+type ModuleDirs struct {
+	set  map[ModuleDir]bool
+	list []ModuleDir
+}
+
+func NewModuleDirs() *ModuleDirs {
+	return &ModuleDirs{
+		set: make(map[ModuleDir]bool, 64),
+	}
+}
+
+func (d *ModuleDirs) Add(dir ModuleDir) {
+	d.set[dir] = true
+}
+
+func (d *ModuleDirs) List() []ModuleDir {
+	if d.list != nil {
+		return d.list
+	}
+	return d.generateList()
+}
+
+func (d *ModuleDirs) generateList() []ModuleDir {
+	result := make([]ModuleDir, 0, len(d.set))
+	for dir := range d.set {
+		result = append(result, dir)
+	}
+	sort.Strings(result)
+	d.list = result
+	return result
+}
+
+func (d *ModuleDirs) MarshalJSON() ([]byte, error) {
+	return json.Marshal(d.List())
+}
+
+func (d *ModuleDirs) ToJson() string {
+	return SimpleJsonMarshal(d)
+}
+
 type TfDirs struct {
 	set  map[TfDir]bool
 	list []TfDir
@@ -157,6 +197,42 @@ func (m *DependentMap) String() string {
 }
 
 func (m *DependentMap) ToJson() string {
+	return SimpleJsonMarshal(m)
+}
+
+type DependencyMap struct {
+	set map[TfDir][]ModuleDir
+}
+
+func NewDependencyMap() *DependencyMap {
+	return &DependencyMap{
+		set: make(map[TfDir][]ModuleDir, 64),
+	}
+}
+
+func (m *DependencyMap) Add(tfDir TfDir, moduleDir ModuleDir) {
+	m.set[tfDir] = append(m.set[tfDir], moduleDir)
+}
+
+func (m *DependencyMap) ListModuleDirSlice(tfDir TfDir) []ModuleDir {
+	result, _ := m.set[tfDir]
+	return result
+}
+
+func (m *DependencyMap) IsTf(tfDir TfDir) bool {
+	_, ok := m.set[tfDir]
+	return ok
+}
+
+func (m *DependencyMap) String() string {
+	result := ""
+	for k, v := range m.set {
+		result += fmt.Sprintf("%s:%s\n", k, strings.Join(v, " "))
+	}
+	return result
+}
+
+func (m *DependencyMap) ToJson() string {
 	return SimpleJsonMarshal(m)
 }
 

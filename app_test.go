@@ -9,10 +9,12 @@ import (
 
 func TestAppRunWithDependencies(t *testing.T) {
 	cases := []struct {
-		args []string
+		args     []string
+		expected string
 	}{
 		{
-			args: []string{"dependencies"},
+			args:     []string{"dependencies", "--state-dirs", "testdata/terraform/env/dev"},
+			expected: "[\"testdata/terraform/module/foo\"]\n",
 		},
 	}
 
@@ -24,18 +26,9 @@ func TestAppRunWithDependencies(t *testing.T) {
 			t.Fatalf("%s: unexpected error: %e", strings.Join(tc.args, " "), err)
 		}
 
-		expectedStrings := []string{
-			"testdata/terraform/module/bar:testdata/terraform/env/prd",
-			//"\"testdata/terraform/module/bar\":[\"testdata/terraform/env/prd\"]",
-			//"\"testdata/terraform/module/baz\":[\"testdata/terraform/module/bar\",\"testdata/terraform/env/prd\"]",
-			//"\"testdata/terraform/module/foo\":[\"testdata/terraform/env/dev\",\"testdata/terraform/env/prd\",\"testdata/terraform/env/stg\"]",
-		}
-
 		actual := app.IO.OutWriter.(*bytes.Buffer).String()
-		for _, expected := range expectedStrings {
-			if !strings.Contains(actual, expected) {
-				t.Errorf("%s:\n expected: %s,\n actual: %s", strings.Join(tc.args, " "), expected, actual)
-			}
+		if actual != tc.expected {
+			t.Errorf("%s: expected: %s, actual: %s", strings.Join(tc.args, " "), tc.expected, actual)
 		}
 	}
 }
