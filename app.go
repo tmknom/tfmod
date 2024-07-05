@@ -117,3 +117,7 @@ type GlobalFlags struct {
 func (f *GlobalFlags) BaseDir() *BaseDir {
 	return NewBaseDir(f.InputBaseDir)
 }
+
+func (f *GlobalFlags) GoString() string {
+	return fmt.Sprintf("%#v", *f)
+}
