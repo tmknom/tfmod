@@ -58,6 +58,6 @@ func (s *InMemoryStore) ListModuleDirs(stateDirs []string) *ModuleDirs {
 }
 
 func (s *InMemoryStore) Dump() {
-	log.Printf("DependencyMap: %#v", s.DependencyMap)
-	log.Printf("DependentMap: %#v", s.DependentMap)
+	log.Printf("DependencyMap: %v", s.DependencyMap)
+	log.Printf("DependentMap: %v", s.DependentMap)
 }

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"github.com/tmknom/tfmod/internal/errlib"
 )
@@ -238,11 +239,15 @@ func (m *DependentMap) IsModule(moduleDir string) bool {
 }
 
 func (m *DependentMap) String() string {
-	result := ""
-	for key, value := range m.set {
-		result += fmt.Sprintf("%s:%#v\n", key, value)
+	items := make([]string, 0, len(m.set))
+	for key, tfDirs := range m.set {
+		strDirs := make([]string, 0, len(tfDirs))
+		for _, tfDir := range tfDirs {
+			strDirs = append(strDirs, tfDir.Rel())
+		}
+		items = append(items, fmt.Sprintf("%s:%v", key, strDirs))
 	}
-	return result
+	return strings.Join(items, ", ")
 }
 
 func (m *DependentMap) ToJson() string {
@@ -270,11 +275,15 @@ func (m *DependencyMap) ListModuleDirSlice(tfDir string) []*ModuleDir {
 }
 
 func (m *DependencyMap) String() string {
-	result := ""
-	for key, value := range m.set {
-		result += fmt.Sprintf("%s:%#v\n", key, value)
+	items := make([]string, 0, len(m.set))
+	for key, moduleDirs := range m.set {
+		strDirs := make([]string, 0, len(moduleDirs))
+		for _, moduleDir := range moduleDirs {
+			strDirs = append(strDirs, moduleDir.Rel())
+		}
+		items = append(items, fmt.Sprintf("%s:%v", key, strDirs))
 	}
-	return result
+	return strings.Join(items, ", ")
 }
 
 func (m *DependencyMap) ToJson() string {
