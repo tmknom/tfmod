@@ -13,7 +13,7 @@ type Parser struct {
 	Store
 }
 
-func NewParser(baseDir *BaseDir, store Store) *Parser {
+func NewParser(store Store) *Parser {
 	return &Parser{
 		Store: store,
 	}
@@ -32,13 +32,13 @@ func (p *Parser) ParseAll(sourceDirs []*SourceDir) error {
 		}
 
 		for _, moduleDir := range moduleDirs {
-			p.Store.Save(moduleDir, sourceDir.Rel())
+			p.Store.Save(moduleDir, sourceDir.ToTfDir())
 		}
 	}
 	return nil
 }
 
-func (p *Parser) Parse(sourceDir *SourceDir, raw []byte) ([]ModuleDir, error) {
+func (p *Parser) Parse(sourceDir *SourceDir, raw []byte) ([]*ModuleDir, error) {
 	var modulesJson ModulesJson
 
 	err := json.Unmarshal(raw, &modulesJson)
@@ -46,7 +46,7 @@ func (p *Parser) Parse(sourceDir *SourceDir, raw []byte) ([]ModuleDir, error) {
 		return nil, errlib.Wrapf(err, "invalid json: %s", string(raw))
 	}
 
-	result := make([]ModuleDir, 0, len(modulesJson.Modules))
+	relModuleDirs := make([]string, 0, len(modulesJson.Modules))
 	for _, module := range modulesJson.Modules {
 		if module.Dir == "." {
 			continue
@@ -61,11 +61,14 @@ func (p *Parser) Parse(sourceDir *SourceDir, raw []byte) ([]ModuleDir, error) {
 		if err != nil {
 			return nil, errlib.Wrapf(err, "invalid absolute module dir: %s", absModuleDir)
 		}
-
-		result = append(result, relModuleDir)
+		relModuleDirs = append(relModuleDirs, relModuleDir)
 	}
 
-	sort.Strings(result)
+	sort.Strings(relModuleDirs)
+	result := make([]*ModuleDir, 0, len(relModuleDirs))
+	for _, dir := range relModuleDirs {
+		result = append(result, NewModuleDir(dir, sourceDir.baseDir))
+	}
 	return result, nil
 }
 

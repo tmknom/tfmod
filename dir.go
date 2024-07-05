@@ -80,6 +80,10 @@ func (d *SourceDir) Rel() string {
 	return rel
 }
 
+func (d *SourceDir) ToTfDir() *TfDir {
+	return NewTfDir(d.Rel(), d.baseDir)
+}
+
 func (d *SourceDir) AbsBaseDir() string {
 	return d.baseDir.Abs()
 }
@@ -88,33 +92,70 @@ func (d *SourceDir) String() string {
 	return d.Rel()
 }
 
-type TfDir = string
-type ModuleDir = string
+type ModuleDir struct {
+	raw     string
+	baseDir *BaseDir
+}
+
+func NewModuleDir(raw string, baseDir *BaseDir) *ModuleDir {
+	return &ModuleDir{
+		raw:     raw,
+		baseDir: baseDir,
+	}
+}
+
+func (d *ModuleDir) Rel() string {
+	return d.raw
+}
+
+func (d *ModuleDir) String() string {
+	return d.Rel()
+}
 
 type ModuleDirs struct {
-	set  map[ModuleDir]bool
-	list []ModuleDir
+	set  map[string]bool
+	list []string
+}
+
+type TfDir struct {
+	raw     string
+	baseDir *BaseDir
+}
+
+func NewTfDir(raw string, baseDir *BaseDir) *TfDir {
+	return &TfDir{
+		raw:     raw,
+		baseDir: baseDir,
+	}
+}
+
+func (d *TfDir) Rel() string {
+	return d.raw
+}
+
+func (d *TfDir) String() string {
+	return d.Rel()
 }
 
 func NewModuleDirs() *ModuleDirs {
 	return &ModuleDirs{
-		set: make(map[ModuleDir]bool, 64),
+		set: make(map[string]bool, 64),
 	}
 }
 
-func (d *ModuleDirs) Add(dir ModuleDir) {
+func (d *ModuleDirs) Add(dir string) {
 	d.set[dir] = true
 }
 
-func (d *ModuleDirs) List() []ModuleDir {
+func (d *ModuleDirs) List() []string {
 	if d.list != nil {
 		return d.list
 	}
 	return d.generateList()
 }
 
-func (d *ModuleDirs) generateList() []ModuleDir {
-	result := make([]ModuleDir, 0, len(d.set))
+func (d *ModuleDirs) generateList() []string {
+	result := make([]string, 0, len(d.set))
 	for dir := range d.set {
 		result = append(result, dir)
 	}
@@ -182,7 +223,7 @@ func NewDependentMap() *DependentMap {
 }
 
 func (m *DependentMap) Add(moduleDir *ModuleDir, tfDir *TfDir) {
-	key := *moduleDir
+	key := moduleDir.Rel()
 	m.set[key] = append(m.set[key], tfDir)
 }
 
@@ -219,18 +260,13 @@ func NewDependencyMap() *DependencyMap {
 }
 
 func (m *DependencyMap) Add(tfDir *TfDir, moduleDir *ModuleDir) {
-	key := *tfDir
+	key := tfDir.Rel()
 	m.set[key] = append(m.set[key], moduleDir)
 }
 
 func (m *DependencyMap) ListModuleDirSlice(tfDir string) []*ModuleDir {
 	result, _ := m.set[tfDir]
 	return result
-}
-
-func (m *DependencyMap) IsTf(tfDir string) bool {
-	_, ok := m.set[tfDir]
-	return ok
 }
 
 func (m *DependencyMap) String() string {

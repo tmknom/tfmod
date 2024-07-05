@@ -34,7 +34,7 @@ func (l *Loader) Load() error {
 	}
 	log.Printf("Execute terraform get to: %v", sourceDirs)
 
-	parser := NewParser(l.BaseDir, l.Store)
+	parser := NewParser(l.Store)
 	err = parser.ParseAll(sourceDirs)
 	if err != nil {
 		return err
