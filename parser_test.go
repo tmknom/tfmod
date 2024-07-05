@@ -6,14 +6,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	_ "github.com/google/go-cmp/cmp"
 )
 
 func TestParser_Parse(t *testing.T) {
 	store := &ParserFakeStore{}
-	currentDir, _ := os.Getwd()
-	baseDir := NewBaseDir(currentDir)
-	parser := NewParser(baseDir, store)
+	parser := NewParser(store)
 	moduleJson := `
 {
   "Modules": [
@@ -36,15 +34,23 @@ func TestParser_Parse(t *testing.T) {
 }
 `
 
+	currentDir, _ := os.Getwd()
+	baseDir := NewBaseDir(currentDir)
 	actual, err := parser.Parse(NewSourceDir("env/dev", baseDir), []byte(moduleJson))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	expected := []string{"module/bar", "module/foo"}
-	if diff := cmp.Diff(expected, actual); diff != "" {
-		t.Errorf("expected: %v, actual: %v", expected, actual)
+	for i, dir := range actual {
+		if dir.Rel() != expected[i] {
+			t.Errorf("expected: %v, actual: %v", expected, actual)
+		}
 	}
+	//if diff := cmp.Diff(expected, actual); diff != "" {
+	//	t.Errorf("expected: %v, actual: %v", expected, actual)
+	//}
+	//t.Errorf("expected: %v, actual: %v", expected, actual)
 }
 
 type ParserFakeStore struct {
@@ -56,8 +62,8 @@ func (s *ParserFakeStore) Actual() []string {
 	return s.list
 }
 
-func (s *ParserFakeStore) Save(moduleDir ModuleDir, tfDir TfDir) {
-	pair := strings.Join([]string{moduleDir, tfDir}, ":")
+func (s *ParserFakeStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
+	pair := strings.Join([]string{moduleDir.Rel(), tfDir.Rel()}, ":")
 	s.list = append(s.list, pair)
 }
 
