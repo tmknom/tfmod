@@ -27,7 +27,7 @@ func (l *Loader) Load() error {
 	}
 	log.Printf("Generate tfdirs from: %v", l.BaseDir)
 
-	terraform := NewTerraform(l.IO)
+	terraform := NewTerraform()
 	err = terraform.ExecuteGetAll(*l.BaseDir, tfDirs)
 	if err != nil {
 		return err

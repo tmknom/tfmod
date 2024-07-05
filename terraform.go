@@ -1,18 +1,18 @@
 package tfmod
 
 import (
+	"bytes"
+	"fmt"
 	"log"
 	"os/exec"
+
+	"github.com/tmknom/tfmod/internal/errlib"
 )
 
-type Terraform struct {
-	*IO
-}
+type Terraform struct{}
 
-func NewTerraform(io *IO) *Terraform {
-	return &Terraform{
-		IO: io,
-	}
+func NewTerraform() *Terraform {
+	return &Terraform{}
 }
 
 func (t *Terraform) ExecuteGetAll(baseDir BaseDir, dirs *TfDirs) error {
@@ -32,11 +32,17 @@ func (t *Terraform) executeGet(dir string) error {
 
 	cmd := exec.Command("terraform", "get")
 	cmd.Dir = dir
-	cmd.Stdout = t.OutWriter
-	cmd.Stderr = t.ErrWriter
+	cmd.Stdout = &bytes.Buffer{}
+	cmd.Stderr = &bytes.Buffer{}
 
-	log.Printf("execute: %s (at %s)\n", cmd.String(), cmd.Dir)
-	return cmd.Run()
+	cmdInfo := fmt.Sprintf("execute: %s (at %s)\n", cmd.String(), cmd.Dir)
+	log.Printf(cmdInfo)
+
+	err := cmd.Run()
+	if err != nil {
+		return errlib.Wrapf(err, "%s\n stdout: %v\n stderr: %v\n", cmdInfo, cmd.Stdout, cmd.Stderr)
+	}
+	return nil
 }
 
 const (
