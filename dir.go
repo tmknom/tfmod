@@ -85,6 +85,10 @@ func (d *SourceDir) AbsBaseDir() string {
 	return d.baseDir.Abs()
 }
 
+func (d *SourceDir) String() string {
+	return d.Rel()
+}
+
 type TfDir = string
 type ModuleDir = string
 
