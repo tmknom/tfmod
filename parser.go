@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+
+	"github.com/tmknom/tfmod/internal/errlib"
 )
 
 type Parser struct {
@@ -23,7 +25,7 @@ func (p *Parser) ParseAll(tfDirs *TfDirs) error {
 	for _, tfDir := range tfDirs.List() {
 		raw, err := os.ReadFile(filepath.Join(p.BaseDir.Abs(), tfDir, ModulesPath))
 		if err != nil {
-			return err
+			return errlib.Wrapf(err, "not readfile")
 		}
 
 		moduleDirs, err := p.Parse(tfDir, raw)
@@ -43,7 +45,7 @@ func (p *Parser) Parse(tfDir TfDir, raw []byte) ([]ModuleDir, error) {
 
 	err := json.Unmarshal(raw, &modulesJson)
 	if err != nil {
-		return nil, err
+		return nil, errlib.Wrapf(err, "invalid json: %s", string(raw))
 	}
 
 	result := make([]ModuleDir, 0, len(modulesJson.Modules))
@@ -54,12 +56,12 @@ func (p *Parser) Parse(tfDir TfDir, raw []byte) ([]ModuleDir, error) {
 
 		absModuleDir, err := filepath.Abs(filepath.Join(p.BaseDir.Abs(), tfDir, module.Dir))
 		if err != nil {
-			return nil, err
+			return nil, errlib.Wrapf(err, "invalid json at Modules.Dir: %s", module.Dir)
 		}
 
 		relModuleDir, err := filepath.Rel(p.BaseDir.Abs(), absModuleDir)
 		if err != nil {
-			return nil, err
+			return nil, errlib.Wrapf(err, "invalid absolute module dir: %s", absModuleDir)
 		}
 
 		result = append(result, relModuleDir)

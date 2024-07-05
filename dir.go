@@ -32,14 +32,14 @@ func (d *BaseDir) Abs() string {
 	if len(dir) > 0 && dir[0] != '/' {
 		currentDir, err := os.Getwd()
 		if err != nil {
-			log.Fatalln("invalid current directory:", err)
+			log.Fatalf("%+v", errlib.Wrapf(err, "invalid current dir: %s", dir))
 		}
 		dir = filepath.Join(currentDir, dir)
 	}
 
 	result, err := filepath.Abs(dir)
 	if err != nil {
-		log.Fatalln("invalid base dir:", err)
+		log.Fatalf("%+v", errlib.Wrapf(err, "invalid base dir: %s", dir))
 	}
 	return result
 }
@@ -163,7 +163,7 @@ func (m *DependentMap) ToJson() string {
 func SimpleJsonMarshal(v any) string {
 	bytes, err := json.Marshal(v)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("%+v", errlib.Wrapf(err, "invalid json: %#v", v))
 	}
 	return string(bytes)
 }
