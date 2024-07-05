@@ -43,6 +43,7 @@ func NewApp(io *IO, ldflags *Ldflags) *App {
 func (a *App) Run(args []string) error {
 	a.prepareCommand(args)
 
+	a.rootCmd.PersistentFlags().BoolVar(&a.GlobalFlags.Debug, "debug", false, "show debugging output")
 	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.InputBaseDir, "base-dir", "b", ".", "base directory")
 
 	a.rootCmd.AddCommand(a.newDependenciesCommand())
@@ -94,8 +95,10 @@ func (a *App) prepareCommand(args []string) {
 }
 
 func (a *App) setupLog(name string, args []string) {
-	//log.SetOutput(io.Discard)
-	log.SetOutput(os.Stderr)
+	log.SetOutput(io.Discard)
+	if a.GlobalFlags.Debug {
+		log.SetOutput(os.Stderr)
+	}
 	log.SetPrefix(fmt.Sprintf("[%s] ", a.Ldflags.Name))
 	log.Printf("Start: %s", name)
 	log.Printf("Args: %q", args)
@@ -105,6 +108,7 @@ func (a *App) setupLog(name string, args []string) {
 
 type GlobalFlags struct {
 	InputBaseDir string
+	Debug        bool
 }
 
 func (f *GlobalFlags) BaseDir() *BaseDir {
