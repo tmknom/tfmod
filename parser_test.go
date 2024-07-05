@@ -12,7 +12,8 @@ import (
 func TestParser_Parse(t *testing.T) {
 	store := &ParserFakeStore{}
 	currentDir, _ := os.Getwd()
-	parser := NewParser(NewBaseDir(currentDir), store)
+	baseDir := NewBaseDir(currentDir)
+	parser := NewParser(baseDir, store)
 	moduleJson := `
 {
   "Modules": [
@@ -35,7 +36,7 @@ func TestParser_Parse(t *testing.T) {
 }
 `
 
-	actual, err := parser.Parse("env/dev", []byte(moduleJson))
+	actual, err := parser.Parse(NewSourceDir("env/dev", baseDir), []byte(moduleJson))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

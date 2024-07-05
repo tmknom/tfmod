@@ -44,27 +44,49 @@ func (d *BaseDir) Abs() string {
 	return result
 }
 
-func (d *BaseDir) ListTfDirs() (*TfDirs, error) {
-	tfDirs := NewTfDirs()
-	err := filepath.WalkDir(d.Abs(), func(path string, entry fs.DirEntry, err error) error {
+func (d *BaseDir) GenerateSourceDirs() ([]*SourceDir, error) {
+	sourceDirs := make([]*SourceDir, 0, 64)
+
+	err := filepath.WalkDir(d.Abs(), func(absFilepath string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return errlib.Wrapf(err, "invalid base dir: %#v", d)
 		}
 		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".tf" {
-			relPath, err := filepath.Rel(d.Abs(), path)
-			if err != nil {
-				return errlib.Wrapf(err, "invalid base dir: %#v", d)
-			}
-			tfDirs.Add(filepath.Dir(relPath))
+			target := NewSourceDir(filepath.Dir(absFilepath), d)
+			sourceDirs = append(sourceDirs, target)
 		}
 		return nil
 	})
-	return tfDirs, err
+	return sourceDirs, err
+}
+
+type SourceDir struct {
+	abs     string
+	baseDir *BaseDir
+}
+
+func NewSourceDir(abs string, baseDir *BaseDir) *SourceDir {
+	return &SourceDir{
+		abs:     abs,
+		baseDir: baseDir,
+	}
+}
+
+func (d *SourceDir) Abs() string {
+	return d.abs
+}
+
+func (d *SourceDir) Rel() string {
+	rel, _ := filepath.Rel(d.baseDir.Abs(), d.Abs())
+	return rel
+}
+
+func (d *SourceDir) AbsBaseDir() string {
+	return d.baseDir.Abs()
 }
 
 type TfDir = string
 type ModuleDir = string
-type SourceDir = string
 
 type ModuleDirs struct {
 	set  map[ModuleDir]bool
