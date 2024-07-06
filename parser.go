@@ -21,7 +21,7 @@ func NewParser(store Store) *Parser {
 
 func (p *Parser) ParseAll(sourceDirs []*SourceDir) error {
 	for _, sourceDir := range sourceDirs {
-		raw, err := os.ReadFile(filepath.Join(sourceDir.Abs(), ModulesPath))
+		raw, err := os.ReadFile(filepath.Join(sourceDir.Abs(), TerraformModulesPath))
 		if err != nil {
 			return errlib.Wrapf(err, "not readfile")
 		}
@@ -39,15 +39,14 @@ func (p *Parser) ParseAll(sourceDirs []*SourceDir) error {
 }
 
 func (p *Parser) Parse(sourceDir *SourceDir, raw []byte) ([]*ModuleDir, error) {
-	var modulesJson ModulesJson
-
-	err := json.Unmarshal(raw, &modulesJson)
+	var terraformModulesJson TerraformModulesJson
+	err := json.Unmarshal(raw, &terraformModulesJson)
 	if err != nil {
 		return nil, errlib.Wrapf(err, "invalid json: %s", string(raw))
 	}
 
-	relModuleDirs := make([]*ModuleDir, 0, len(modulesJson.Modules))
-	for _, module := range modulesJson.Modules {
+	relModuleDirs := make([]*ModuleDir, 0, len(terraformModulesJson.Modules))
+	for _, module := range terraformModulesJson.Modules {
 		if module.Dir == "." {
 			continue
 		}
@@ -61,12 +60,16 @@ func (p *Parser) Parse(sourceDir *SourceDir, raw []byte) ([]*ModuleDir, error) {
 	return relModuleDirs, nil
 }
 
-type Module struct {
+type TerraformModule struct {
 	Key    string `json:"Key"`
 	Source string `json:"Source"`
 	Dir    string `json:"Dir"`
 }
 
-type ModulesJson struct {
-	Modules []Module `json:"Modules"`
+type TerraformModulesJson struct {
+	Modules []TerraformModule `json:"Modules"`
 }
+
+const (
+	TerraformModulesPath = ".terraform/modules/modules.json"
+)

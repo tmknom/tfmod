@@ -2,7 +2,6 @@ package tfmod
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/tmknom/tfmod/internal/collection"
 	"github.com/tmknom/tfmod/internal/dir"
@@ -53,70 +52,54 @@ func NewTfDir(raw string, baseDir *dir.BaseDir) *TfDir {
 }
 
 type DependentMap struct {
-	set map[string][]*TfDir
+	*DirMap[ModuleDir, TfDir]
 }
 
 func NewDependentMap() *DependentMap {
 	return &DependentMap{
-		set: make(map[string][]*TfDir, 64),
+		DirMap: NewDirMap[ModuleDir, TfDir](),
 	}
 }
 
-func (m *DependentMap) Add(moduleDir *ModuleDir, tfDir *TfDir) {
-	key := moduleDir.Rel()
-	m.set[key] = append(m.set[key], tfDir)
-}
-
-func (m *DependentMap) ListTfDirSlice(moduleDir string) []*TfDir {
-	result, _ := m.set[moduleDir]
-	return result
-}
-
-func (m *DependentMap) IsModule(moduleDir string) bool {
-	_, ok := m.set[moduleDir]
-	return ok
-}
-
-func (m *DependentMap) String() string {
-	items := make([]string, 0, len(m.set))
-	for key, tfDirs := range m.set {
-		strDirs := make([]string, 0, len(tfDirs))
-		for _, tfDir := range tfDirs {
-			strDirs = append(strDirs, tfDir.Rel())
-		}
-		items = append(items, fmt.Sprintf("%s:%v", key, strDirs))
-	}
-	return strings.Join(items, ", ")
+func (m *DependentMap) IsModule(dir string) bool {
+	return m.Include(dir)
 }
 
 type DependencyMap struct {
-	set map[string][]*ModuleDir
+	*DirMap[TfDir, ModuleDir]
 }
 
 func NewDependencyMap() *DependencyMap {
 	return &DependencyMap{
-		set: make(map[string][]*ModuleDir, 64),
+		DirMap: NewDirMap[TfDir, ModuleDir](),
 	}
 }
 
-func (m *DependencyMap) Add(tfDir *TfDir, moduleDir *ModuleDir) {
-	key := tfDir.Rel()
-	m.set[key] = append(m.set[key], moduleDir)
+type DirMap[S, D dir.Path] struct {
+	items map[string][]*D
 }
 
-func (m *DependencyMap) ListModuleDirSlice(tfDir string) []*ModuleDir {
-	result, _ := m.set[tfDir]
+func NewDirMap[S, D dir.Path]() *DirMap[S, D] {
+	return &DirMap[S, D]{
+		items: make(map[string][]*D, 64),
+	}
+}
+
+func (m *DirMap[S, D]) Add(src *S, dst *D) {
+	key := (*src).Rel()
+	m.items[key] = append(m.items[key], dst)
+}
+
+func (m *DirMap[S, D]) Include(src string) bool {
+	_, ok := m.items[src]
+	return ok
+}
+
+func (m *DirMap[S, D]) ListDst(src string) []*D {
+	result, _ := m.items[src]
 	return result
 }
 
-func (m *DependencyMap) String() string {
-	items := make([]string, 0, len(m.set))
-	for key, moduleDirs := range m.set {
-		strDirs := make([]string, 0, len(moduleDirs))
-		for _, moduleDir := range moduleDirs {
-			strDirs = append(strDirs, moduleDir.Rel())
-		}
-		items = append(items, fmt.Sprintf("%s:%v", key, strDirs))
-	}
-	return strings.Join(items, ", ")
+func (m *DirMap[S, D]) String() string {
+	return fmt.Sprintf("%v", m.items)
 }

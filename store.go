@@ -30,7 +30,7 @@ func (s *InMemoryStore) ListTfDirs(moduleDirs []string) *Dirs {
 	result := NewDirs()
 
 	for _, moduleDir := range moduleDirs {
-		tfDirs := s.DependentMap.ListTfDirSlice(moduleDir)
+		tfDirs := s.DependentMap.ListDst(moduleDir)
 		for _, tfDir := range tfDirs {
 			if !s.DependentMap.IsModule(tfDir.Rel()) {
 				result.Add(tfDir.Rel())
@@ -45,7 +45,7 @@ func (s *InMemoryStore) ListModuleDirs(stateDirs []string) *Dirs {
 	result := NewDirs()
 
 	for _, dir := range stateDirs {
-		moduleDirs := s.DependencyMap.ListModuleDirSlice(dir)
+		moduleDirs := s.DependencyMap.ListDst(dir)
 		for _, moduleDir := range moduleDirs {
 			result.Add(moduleDir.Rel())
 		}

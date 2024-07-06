@@ -44,7 +44,3 @@ func (t *Terraform) executeGet(dir string, enable bool) error {
 	}
 	return nil
 }
-
-const (
-	ModulesPath = ".terraform/modules/modules.json"
-)
