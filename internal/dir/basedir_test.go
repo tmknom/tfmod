@@ -42,7 +42,7 @@ func TestBaseDir_Abs(t *testing.T) {
 func TestBaseDir_FilterSubDirs(t *testing.T) {
 	rel := "../../testdata/terraform/env/"
 	sut := NewBaseDir(rel)
-	actual, err := sut.FilterSubDirs(".tf")
+	actual, err := sut.FilterSubDirs(".tf", ".terraform")
 
 	expected := []string{
 		filepath.Join(sut.Abs(), "dev"),

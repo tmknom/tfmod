@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"github.com/tmknom/tfmod/internal/errlib"
 )
@@ -49,14 +50,14 @@ func (d *BaseDir) generateAbs() string {
 	return d.abs
 }
 
-func (d *BaseDir) FilterSubDirs(ext string) ([]string, error) {
+func (d *BaseDir) FilterSubDirs(ext string, exclude string) ([]string, error) {
 	sourceDirs := make([]string, 0, 64)
 
 	err := filepath.WalkDir(d.Abs(), func(absFilepath string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return errlib.Wrapf(err, "invalid base dir: %#v", d)
 		}
-		if !entry.IsDir() && filepath.Ext(entry.Name()) == ext {
+		if !entry.IsDir() && filepath.Ext(entry.Name()) == ext && !strings.Contains(absFilepath, exclude) {
 			target := filepath.Dir(absFilepath)
 			sourceDirs = append(sourceDirs, target)
 		}

@@ -23,7 +23,7 @@ func NewLoader(store Store, baseDir *dir.BaseDir, enableTf bool) *Loader {
 func (l *Loader) Load() error {
 	log.Printf("BaseDir: %v", l.BaseDir)
 
-	subDirs, err := l.BaseDir.FilterSubDirs(".tf")
+	subDirs, err := l.BaseDir.FilterSubDirs(".tf", ".terraform")
 	if err != nil {
 		return err
 	}
