@@ -2,6 +2,7 @@ package tfmod
 
 import (
 	"log"
+	"path/filepath"
 
 	"github.com/tmknom/tfmod/internal/dir"
 )
@@ -23,7 +24,7 @@ func NewLoader(store Store, baseDir *dir.BaseDir, enableTf bool) *Loader {
 func (l *Loader) Load() error {
 	log.Printf("BaseDir: %v", l.BaseDir)
 
-	subDirs, err := l.BaseDir.FilterSubDirs(".tf", ".terraform")
+	subDirs, err := l.BaseDir.FilterSubDirs(".tf", filepath.Dir(TerraformModulesPath))
 	if err != nil {
 		return err
 	}
