@@ -3,6 +3,8 @@ package tfmod
 import (
 	"fmt"
 	"log"
+
+	"github.com/tmknom/tfmod/internal/format"
 )
 
 type Dependencies struct {
@@ -35,17 +37,23 @@ func (f *DependenciesFlags) GoString() string {
 }
 
 func (d *Dependencies) Run() error {
-	log.Printf("Runner flags: %#v", d.flags)
-
-	err := NewLoader(d.Store, d.flags.BaseDir(), d.flags.EnableTf).Load()
+	list, err := d.List()
 	if err != nil {
 		return err
 	}
-	log.Printf("Load from: %v", d.flags.BaseDir())
-	d.Store.Dump()
+	return format.NewSliceFormatter(d.flags.Format, list, d.IO.OutWriter).Print()
+}
+
+func (d *Dependencies) List() ([]string, error) {
+	log.Printf("Runner flags: %#v", d.flags)
+
+	err := NewLoader(d.Store, d.flags.GetBaseDir(), d.flags.EnableTf).Load()
+	if err != nil {
+		return nil, err
+	}
 
 	result := d.Store.ListModuleDirs(d.flags.StateDirs)
-	log.Printf("Write stdout from: %#v", result)
-	_, err = fmt.Fprintln(d.IO.OutWriter, result.ToJson())
-	return err
+	log.Printf("Result: %#v", result)
+
+	return result, nil
 }

@@ -33,31 +33,3 @@ func TestTreeSet_AddAndSlice(t *testing.T) {
 		}
 	}
 }
-
-func TestTreeSet_ToJson(t *testing.T) {
-	cases := []struct {
-		items    []string
-		expected string
-	}{
-		{
-			items:    []string{"foo", "bar", "baz"},
-			expected: "[\"bar\",\"baz\",\"foo\"]",
-		},
-		{
-			items:    []string{"foo", "bar", "foo"},
-			expected: "[\"bar\",\"foo\"]",
-		},
-	}
-
-	for _, tc := range cases {
-		set := NewTreeSet()
-		for _, item := range tc.items {
-			set.Add(item)
-		}
-
-		actual := set.ToJson()
-		if actual != tc.expected {
-			t.Errorf("expected: %v, actual: %v", tc.expected, actual)
-		}
-	}
-}

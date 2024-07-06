@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"github.com/tmknom/tfmod/internal/errlib"
 )
@@ -47,10 +48,11 @@ func (p *Parser) Parse(sourceDir *SourceDir, raw []byte) ([]*ModuleDir, error) {
 
 	relModuleDirs := make([]*ModuleDir, 0, len(terraformModulesJson.Modules))
 	for _, module := range terraformModulesJson.Modules {
-		if module.Dir == "." {
+		rawDir := module.Dir
+		if rawDir == "." || strings.Contains(rawDir, filepath.Dir(TerraformModulesPath)) {
 			continue
 		}
-		moduleDir := NewModuleDir(filepath.Join(sourceDir.Abs(), module.Dir), sourceDir.BaseDir())
+		moduleDir := NewModuleDir(filepath.Join(sourceDir.Abs(), rawDir), sourceDir.BaseDir())
 		relModuleDirs = append(relModuleDirs, moduleDir)
 	}
 

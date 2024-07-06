@@ -7,14 +7,14 @@ import (
 	"testing"
 )
 
-func TestAppRunWithDependencies(t *testing.T) {
+func TestApp_Run_Dependencies(t *testing.T) {
 	cases := []struct {
 		args     []string
 		expected string
 	}{
 		{
-			args:     []string{"dependencies", "--state-dirs", "testdata/terraform/env/dev", "--enable-tf=false"},
-			expected: "[\"testdata/terraform/module/foo\"]\n",
+			args:     []string{"dependencies", "--state-dirs", "env/prd", "--base-dir=testdata/terraform", "--enable-tf=false", "--format=json"},
+			expected: "[\"module/bar\",\"module/baz\",\"module/foo\"]\n",
 		},
 	}
 
@@ -28,23 +28,19 @@ func TestAppRunWithDependencies(t *testing.T) {
 
 		actual := app.IO.OutWriter.(*bytes.Buffer).String()
 		if actual != tc.expected {
-			t.Errorf("%s: expected: %s, actual: %s", strings.Join(tc.args, " "), tc.expected, actual)
+			t.Errorf("%s\n expected: %s actual: %s", strings.Join(tc.args, " "), tc.expected, actual)
 		}
 	}
 }
 
-func TestAppRunWithDependents(t *testing.T) {
+func TestApp_Run_Dependents(t *testing.T) {
 	cases := []struct {
 		args     []string
 		expected string
 	}{
 		{
-			args:     []string{"dependents", "--module-dirs", "testdata/terraform/module/foo", "--enable-tf=false"},
-			expected: "[\"testdata/terraform/env/dev\",\"testdata/terraform/env/prd\",\"testdata/terraform/env/stg\"]\n",
-		},
-		{
-			args:     []string{"dependents", "--module-dirs", "testdata/terraform/module/bar,testdata/terraform/module/baz", "--enable-tf=false"},
-			expected: "[\"testdata/terraform/env/prd\"]\n",
+			args:     []string{"dependents", "--module-dirs", "module/foo", "--base-dir=testdata/terraform", "--enable-tf=false", "--format=text"},
+			expected: "env/dev env/prd env/stg\n",
 		},
 	}
 
@@ -58,7 +54,7 @@ func TestAppRunWithDependents(t *testing.T) {
 
 		actual := app.IO.OutWriter.(*bytes.Buffer).String()
 		if actual != tc.expected {
-			t.Errorf("%s: expected: %s, actual: %s", strings.Join(tc.args, " "), tc.expected, actual)
+			t.Errorf("%s\n expected: %s actual: %s", strings.Join(tc.args, " "), tc.expected, actual)
 		}
 	}
 }

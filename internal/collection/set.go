@@ -1,9 +1,7 @@
 package collection
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
 	"sort"
 )
 
@@ -28,14 +26,6 @@ func (s *TreeSet) Slice() []string {
 	}
 	sort.Strings(result)
 	return result
-}
-
-func (s *TreeSet) ToJson() string {
-	bytes, err := json.Marshal(s.Slice())
-	if err != nil {
-		log.Fatalf("not json marshaled: %#v", s)
-	}
-	return string(bytes)
 }
 
 func (s *TreeSet) String() string {
