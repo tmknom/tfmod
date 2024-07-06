@@ -13,7 +13,7 @@ func TestAppRunWithDependencies(t *testing.T) {
 		expected string
 	}{
 		{
-			args:     []string{"dependencies", "--state-dirs", "testdata/terraform/env/dev"},
+			args:     []string{"dependencies", "--state-dirs", "testdata/terraform/env/dev", "--enable-tf=false"},
 			expected: "[\"testdata/terraform/module/foo\"]\n",
 		},
 	}
@@ -39,11 +39,11 @@ func TestAppRunWithDependents(t *testing.T) {
 		expected string
 	}{
 		{
-			args:     []string{"dependents", "--module-dirs", "testdata/terraform/module/foo"},
+			args:     []string{"dependents", "--module-dirs", "testdata/terraform/module/foo", "--enable-tf=false"},
 			expected: "[\"testdata/terraform/env/dev\",\"testdata/terraform/env/prd\",\"testdata/terraform/env/stg\"]\n",
 		},
 		{
-			args:     []string{"dependents", "--module-dirs", "testdata/terraform/module/bar,testdata/terraform/module/baz"},
+			args:     []string{"dependents", "--module-dirs", "testdata/terraform/module/bar,testdata/terraform/module/baz", "--enable-tf=false"},
 			expected: "[\"testdata/terraform/env/prd\"]\n",
 		},
 	}

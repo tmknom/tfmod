@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/tmknom/tfmod/internal/dir"
 )
 
 type IO struct {
@@ -105,7 +106,6 @@ func (a *App) setupLog(name string, args []string) {
 	log.Printf("Start: %s", name)
 	log.Printf("Args: %q", args)
 	log.Printf("Ldflags: %+v", a.Ldflags)
-	log.Printf("Global flags: %#v", a.GlobalFlags)
 }
 
 type GlobalFlags struct {
@@ -114,8 +114,8 @@ type GlobalFlags struct {
 	Debug        bool
 }
 
-func (f *GlobalFlags) BaseDir() *BaseDir {
-	return NewBaseDir(f.InputBaseDir)
+func (f *GlobalFlags) BaseDir() *dir.BaseDir {
+	return dir.NewBaseDir(f.InputBaseDir)
 }
 
 func (f *GlobalFlags) GoString() string {
