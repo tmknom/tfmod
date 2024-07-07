@@ -24,6 +24,10 @@ func NewBaseDir(raw string) *BaseDir {
 	}
 }
 
+func (d *BaseDir) CreateDir(raw string) *Dir {
+	return NewDir(raw, d)
+}
+
 func (d *BaseDir) Abs() string {
 	if d.abs != "" {
 		return d.abs
