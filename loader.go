@@ -45,6 +45,9 @@ func (l *Loader) Load() error {
 	}
 	log.Printf("Parse to: %v", sourceDirs)
 
+	l.Store.Dump()
+	log.Printf("Load from: %v", l.BaseDir)
+
 	return nil
 }
 

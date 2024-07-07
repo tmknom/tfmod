@@ -1,11 +1,15 @@
 package tfmod
 
-import "log"
+import (
+	"log"
+
+	"github.com/tmknom/tfmod/internal/collection"
+)
 
 type Store interface {
 	Save(moduleDir *ModuleDir, tfDir *TfDir)
-	ListTfDirs(moduleDirs []string) *Dirs
-	ListModuleDirs(stateDirs []string) *Dirs
+	ListTfDirs(moduleDirs []string) []string
+	ListModuleDirs(stateDirs []string) []string
 	Dump()
 }
 
@@ -26,8 +30,8 @@ func (s *InMemoryStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
 	s.DependentMap.Add(moduleDir, tfDir)
 }
 
-func (s *InMemoryStore) ListTfDirs(moduleDirs []string) *Dirs {
-	result := NewDirs()
+func (s *InMemoryStore) ListTfDirs(moduleDirs []string) []string {
+	result := collection.NewTreeSet()
 
 	for _, moduleDir := range moduleDirs {
 		tfDirs := s.DependentMap.ListDst(moduleDir)
@@ -38,11 +42,11 @@ func (s *InMemoryStore) ListTfDirs(moduleDirs []string) *Dirs {
 		}
 	}
 
-	return result
+	return result.Slice()
 }
 
-func (s *InMemoryStore) ListModuleDirs(stateDirs []string) *Dirs {
-	result := NewDirs()
+func (s *InMemoryStore) ListModuleDirs(stateDirs []string) []string {
+	result := collection.NewTreeSet()
 
 	for _, dir := range stateDirs {
 		moduleDirs := s.DependencyMap.ListDst(dir)
@@ -51,7 +55,7 @@ func (s *InMemoryStore) ListModuleDirs(stateDirs []string) *Dirs {
 		}
 	}
 
-	return result
+	return result.Slice()
 }
 
 func (s *InMemoryStore) Dump() {

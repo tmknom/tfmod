@@ -3,19 +3,8 @@ package tfmod
 import (
 	"fmt"
 
-	"github.com/tmknom/tfmod/internal/collection"
 	"github.com/tmknom/tfmod/internal/dir"
 )
-
-type Dirs struct {
-	*collection.TreeSet
-}
-
-func NewDirs() *Dirs {
-	return &Dirs{
-		TreeSet: collection.NewTreeSet(),
-	}
-}
 
 type SourceDir struct {
 	*dir.Dir

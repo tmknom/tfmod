@@ -42,8 +42,8 @@ func TestParser_Parse(t *testing.T) {
 	}
 
 	expected := []string{"module/bar", "module/foo"}
-	for i, dir := range actual {
-		if dir.Rel() != expected[i] {
+	for i, moduleDir := range actual {
+		if moduleDir.Rel() != expected[i] {
 			t.Errorf("expected: %v, actual: %v", expected, actual)
 		}
 	}
@@ -63,11 +63,11 @@ func (s *ParserFakeStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
 	s.list = append(s.list, pair)
 }
 
-func (s *ParserFakeStore) ListTfDirs(moduleDirs []string) *Dirs {
+func (s *ParserFakeStore) ListTfDirs(moduleDirs []string) []string {
 	return nil
 }
 
-func (s *ParserFakeStore) ListModuleDirs(stateDirs []string) *Dirs {
+func (s *ParserFakeStore) ListModuleDirs(stateDirs []string) []string {
 	return nil
 }
 
