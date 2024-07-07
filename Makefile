@@ -13,7 +13,7 @@ LDFLAGS ?= "-X main.name=$(NAME) -X main.version=$(VERSION) -X main.commit=$(COM
 
 # Targets: Go
 .PHONY: all
-all: mod build test run ## all
+all: mod build test-all run ## all
 
 .PHONY: mod
 mod: ## manage modules
@@ -38,8 +38,12 @@ run: build ## run command
 	bin/tfmod dependents --debug --enable-tf=false --base-dir "testdata" --module-dirs="terraform/module/foo" --format=json
 
 .PHONY: test
-test: lint ## test all
-	go test ./...
+test: lint ## test
+	go test -short ./...
+
+.PHONY: test-all
+test-all: lint ## test all
+	go test -race -shuffle=on ./...
 
 .PHONY: lint
 lint: goimports vet ## lint go
