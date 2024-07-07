@@ -36,7 +36,7 @@ func TestParser_Parse(t *testing.T) {
 
 	currentDir, _ := os.Getwd()
 	baseDir := dir.NewBaseDir(currentDir)
-	actual, err := parser.Parse(NewSourceDir("env/dev", baseDir), []byte(moduleJson))
+	actual, err := parser.Parse(dir.NewDir("env/dev", baseDir), []byte(moduleJson))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

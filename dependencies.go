@@ -7,14 +7,14 @@ import (
 	"github.com/tmknom/tfmod/internal/format"
 )
 
-type Dependencies struct {
+type DependenciesRunner struct {
 	flags *DependenciesFlags
 	Store
 	*IO
 }
 
-func NewDependencies(flags *DependenciesFlags, store Store, io *IO) *Dependencies {
-	return &Dependencies{
+func NewDependenciesRunner(flags *DependenciesFlags, store Store, io *IO) *DependenciesRunner {
+	return &DependenciesRunner{
 		flags: flags,
 		Store: store,
 		IO:    io,
@@ -36,23 +36,31 @@ func (f *DependenciesFlags) GoString() string {
 	return fmt.Sprintf("%#v", *f)
 }
 
-func (d *Dependencies) Run() error {
-	list, err := d.List()
+func (r *DependenciesRunner) Run() error {
+	list, err := r.List()
 	if err != nil {
 		return err
 	}
-	return format.NewSliceFormatter(d.flags.Format, list, d.IO.OutWriter).Print()
+	return format.NewSliceFormatter(r.flags.Format, list, r.IO.OutWriter).Print()
 }
 
-func (d *Dependencies) List() ([]string, error) {
-	log.Printf("Runner flags: %#v", d.flags)
+func (r *DependenciesRunner) List() ([]string, error) {
+	log.Printf("Runner flags: %#v", r.flags)
 
-	err := NewLoader(d.Store, d.flags.GetBaseDir(), d.flags.EnableTf).Load()
+	terraform := NewTerraform(r.flags.GetBaseDir(), r.flags.EnableTf)
+	sourceDirs, err := terraform.GetAll()
 	if err != nil {
 		return nil, err
 	}
 
-	result := d.Store.ListModuleDirs(d.flags.StateDirs)
+	parser := NewParser(r.Store)
+	err = parser.ParseAll(sourceDirs)
+	if err != nil {
+		return nil, err
+	}
+
+	r.Store.Dump()
+	result := r.Store.ListModuleDirs(r.flags.StateDirs)
 	log.Printf("Result: %#v", result)
 
 	return result, nil

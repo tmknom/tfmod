@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/tmknom/tfmod/internal/dir"
 	"github.com/tmknom/tfmod/internal/errlib"
 )
 
@@ -20,7 +21,7 @@ func NewParser(store Store) *Parser {
 	}
 }
 
-func (p *Parser) ParseAll(sourceDirs []*SourceDir) error {
+func (p *Parser) ParseAll(sourceDirs []*dir.Dir) error {
 	for _, sourceDir := range sourceDirs {
 		raw, err := os.ReadFile(filepath.Join(sourceDir.Abs(), TerraformModulesPath))
 		if err != nil {
@@ -33,13 +34,13 @@ func (p *Parser) ParseAll(sourceDirs []*SourceDir) error {
 		}
 
 		for _, moduleDir := range moduleDirs {
-			p.Store.Save(moduleDir, sourceDir.ToTfDir())
+			p.Store.Save(moduleDir, NewTfDir(sourceDir.Rel(), sourceDir.BaseDir()))
 		}
 	}
 	return nil
 }
 
-func (p *Parser) Parse(sourceDir *SourceDir, raw []byte) ([]*ModuleDir, error) {
+func (p *Parser) Parse(sourceDir *dir.Dir, raw []byte) ([]*ModuleDir, error) {
 	var terraformModulesJson TerraformModulesJson
 	err := json.Unmarshal(raw, &terraformModulesJson)
 	if err != nil {

@@ -3,10 +3,7 @@ package dir
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"testing"
-
-	"github.com/google/go-cmp/cmp"
 )
 
 func TestBaseDir_Abs(t *testing.T) {
@@ -42,19 +39,19 @@ func TestBaseDir_Abs(t *testing.T) {
 func TestBaseDir_FilterSubDirs(t *testing.T) {
 	rel := "../../testdata/terraform/env/"
 	sut := NewBaseDir(rel)
+
 	actual, err := sut.FilterSubDirs(".tf", ".terraform")
-
-	expected := []string{
-		filepath.Join(sut.Abs(), "dev"),
-		filepath.Join(sut.Abs(), "prd"),
-		filepath.Join(sut.Abs(), "stg"),
-	}
-
 	if err != nil {
 		t.Fatalf("unexpected error: %#v", err)
 	}
 
-	if diff := cmp.Diff(expected, actual); diff != "" {
-		t.Errorf("expected: %v, actual: %v", expected, actual)
+	expected := []string{"dev", "prd", "stg"}
+	if len(expected) != len(actual) {
+		t.Fatalf("diff length, expected: %v, actual: %v", expected, actual)
+	}
+	for i, item := range expected {
+		if item != actual[i].Rel() {
+			t.Errorf("diff index: %d, expected: %v, actual: %v", i, expected, actual)
+		}
 	}
 }

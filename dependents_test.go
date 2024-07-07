@@ -9,7 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestDependents_List(t *testing.T) {
+func TestDependentsRunner_List(t *testing.T) {
 	cases := []struct {
 		dirs     []string
 		expected []string
@@ -48,7 +48,7 @@ func TestDependents_List(t *testing.T) {
 			ModuleDirs:  tc.dirs,
 			GlobalFlags: globalFlags,
 		}
-		runner := NewDependents(flags, NewInMemoryStore(), bufIO)
+		runner := NewDependentsRunner(flags, NewInMemoryStore(), bufIO)
 
 		actual, err := runner.List()
 		if err != nil {
