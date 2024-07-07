@@ -50,15 +50,15 @@ func (d *BaseDir) generateAbs() string {
 	return d.abs
 }
 
-func (d *BaseDir) FilterSubDirs(ext string, exclude string) ([]string, error) {
-	sourceDirs := make([]string, 0, 64)
+func (d *BaseDir) FilterSubDirs(ext string, exclude string) ([]*Dir, error) {
+	sourceDirs := make([]*Dir, 0, 64)
 
 	err := filepath.WalkDir(d.Abs(), func(absFilepath string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return errlib.Wrapf(err, "invalid base dir: %#v", d)
 		}
 		if !entry.IsDir() && filepath.Ext(entry.Name()) == ext && !strings.Contains(absFilepath, exclude) {
-			target := filepath.Dir(absFilepath)
+			target := NewDir(filepath.Dir(absFilepath), d)
 			sourceDirs = append(sourceDirs, target)
 		}
 		return nil
@@ -67,7 +67,10 @@ func (d *BaseDir) FilterSubDirs(ext string, exclude string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	sort.Strings(sourceDirs)
+
+	sort.Slice(sourceDirs, func(i, j int) bool {
+		return sourceDirs[i].Rel() < sourceDirs[j].Rel()
+	})
 
 	return sourceDirs, nil
 }

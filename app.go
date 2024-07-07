@@ -50,15 +50,28 @@ func (a *App) Run(args []string) error {
 	a.rootCmd.PersistentFlags().BoolVar(&a.GlobalFlags.EnableTf, "enable-tf", true, "enable terraform command")
 	a.rootCmd.PersistentFlags().BoolVar(&a.GlobalFlags.Debug, "debug", false, "show debugging output")
 
+	a.rootCmd.AddCommand(a.newGetCommand())
 	a.rootCmd.AddCommand(a.newDependenciesCommand())
 	a.rootCmd.AddCommand(a.newDependentsCommand())
 
 	return a.rootCmd.Execute()
 }
 
+func (a *App) newGetCommand() *cobra.Command {
+	flags := NewGetFlags(a.GlobalFlags)
+	runner := NewGetRunner(flags, NewInMemoryStore(), a.IO)
+	command := &cobra.Command{
+		Use:   "get",
+		Short: "Run terraform get",
+		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
+	}
+	//command.PersistentFlags().StringSliceVarP(&flags.StateDirs, "state-dirs", "s", []string{}, "state dirs")
+	return command
+}
+
 func (a *App) newDependenciesCommand() *cobra.Command {
 	flags := NewDependenciesFlags(a.GlobalFlags)
-	runner := NewDependencies(flags, NewInMemoryStore(), a.IO)
+	runner := NewDependenciesRunner(flags, NewInMemoryStore(), a.IO)
 	command := &cobra.Command{
 		Use:   "dependencies",
 		Short: "List module dependencies",
@@ -70,7 +83,7 @@ func (a *App) newDependenciesCommand() *cobra.Command {
 
 func (a *App) newDependentsCommand() *cobra.Command {
 	flags := NewDependentsFlags(a.GlobalFlags)
-	runner := NewDependents(flags, NewInMemoryStore(), a.IO)
+	runner := NewDependentsRunner(flags, NewInMemoryStore(), a.IO)
 	command := &cobra.Command{
 		Use:   "dependents",
 		Short: "List module dependents",

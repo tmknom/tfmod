@@ -6,20 +6,6 @@ import (
 	"github.com/tmknom/tfmod/internal/dir"
 )
 
-type SourceDir struct {
-	*dir.Dir
-}
-
-func NewSourceDir(raw string, baseDir *dir.BaseDir) *SourceDir {
-	return &SourceDir{
-		Dir: dir.NewDir(raw, baseDir),
-	}
-}
-
-func (d *SourceDir) ToTfDir() *TfDir {
-	return NewTfDir(d.Rel(), d.BaseDir())
-}
-
 type ModuleDir struct {
 	*dir.Dir
 }
