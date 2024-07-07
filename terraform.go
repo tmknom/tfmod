@@ -6,10 +6,13 @@ import (
 	"log"
 	"os/exec"
 	"path/filepath"
+	"sync"
 
 	"github.com/tmknom/tfmod/internal/dir"
 	"github.com/tmknom/tfmod/internal/errlib"
 )
+
+const maxConcurrentJobs = 10
 
 type Terraform struct {
 	baseDir *dir.BaseDir
@@ -38,18 +41,37 @@ func (t *Terraform) GetAll() ([]*dir.Dir, error) {
 }
 
 func (t *Terraform) executeGetAll(workDirs []*dir.Dir) error {
-	for _, workDir := range workDirs {
-		err := t.executeGet(workDir)
-		if err != nil {
-			return err
-		}
+	jobs := make(chan string, len(workDirs))
+	var wg sync.WaitGroup
+
+	for i := 0; i < maxConcurrentJobs; i++ {
+		wg.Add(1)
+		go t.worker(jobs, &wg)
 	}
+
+	for _, workDir := range workDirs {
+		jobs <- workDir.Abs()
+	}
+	close(jobs)
+
+	wg.Wait()
+
 	return nil
 }
 
-func (t *Terraform) executeGet(workDir *dir.Dir) error {
+func (t *Terraform) worker(jobs <-chan string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for workDir := range jobs {
+		err := t.executeGet(workDir)
+		if err != nil {
+			log.Printf("Error terraform get in %s: %v\n", workDir, err)
+		}
+	}
+}
+
+func (t *Terraform) executeGet(workDir string) error {
 	cmd := exec.Command("terraform", "get")
-	cmd.Dir = workDir.Abs()
+	cmd.Dir = workDir
 	cmd.Stdout = &bytes.Buffer{}
 	cmd.Stderr = &bytes.Buffer{}
 
