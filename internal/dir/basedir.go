@@ -6,9 +6,9 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
+	"github.com/tmknom/tfmod/internal/collection"
 	"github.com/tmknom/tfmod/internal/errlib"
 )
 
@@ -51,15 +51,14 @@ func (d *BaseDir) generateAbs() string {
 }
 
 func (d *BaseDir) FilterSubDirs(ext string, exclude string) ([]*Dir, error) {
-	sourceDirs := make([]*Dir, 0, 64)
+	absDirs := collection.NewTreeSet()
 
 	err := filepath.WalkDir(d.Abs(), func(absFilepath string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return errlib.Wrapf(err, "invalid base dir: %#v", d)
 		}
 		if !entry.IsDir() && filepath.Ext(entry.Name()) == ext && !strings.Contains(absFilepath, exclude) {
-			target := NewDir(filepath.Dir(absFilepath), d)
-			sourceDirs = append(sourceDirs, target)
+			absDirs.Add(filepath.Dir(absFilepath))
 		}
 		return nil
 	})
@@ -68,11 +67,11 @@ func (d *BaseDir) FilterSubDirs(ext string, exclude string) ([]*Dir, error) {
 		return nil, err
 	}
 
-	sort.Slice(sourceDirs, func(i, j int) bool {
-		return sourceDirs[i].Rel() < sourceDirs[j].Rel()
-	})
-
-	return sourceDirs, nil
+	result := make([]*Dir, 0, 64)
+	for _, absDir := range absDirs.Slice() {
+		result = append(result, NewDir(absDir, d))
+	}
+	return result, nil
 }
 
 func (d *BaseDir) String() string {
