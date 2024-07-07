@@ -10,7 +10,7 @@ type ModuleDir struct {
 
 func NewModuleDir(raw string, baseDir *dir.BaseDir) *ModuleDir {
 	return &ModuleDir{
-		Dir: dir.NewDir(raw, baseDir),
+		Dir: baseDir.CreateDir(raw),
 	}
 }
 
@@ -20,7 +20,7 @@ type TfDir struct {
 
 func NewTfDir(raw string, baseDir *dir.BaseDir) *TfDir {
 	return &TfDir{
-		Dir: dir.NewDir(raw, baseDir),
+		Dir: baseDir.CreateDir(raw),
 	}
 }
 

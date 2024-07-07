@@ -73,7 +73,7 @@ func (d *BaseDir) FilterSubDirs(ext string, exclude string) ([]*Dir, error) {
 
 	result := make([]*Dir, 0, 64)
 	for _, absDir := range absDirs.Slice() {
-		result = append(result, NewDir(absDir, d))
+		result = append(result, d.CreateDir(absDir))
 	}
 	return result, nil
 }
