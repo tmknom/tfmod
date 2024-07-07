@@ -7,6 +7,10 @@ import (
 )
 
 func TestTerraform_GetAll(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
 	cases := []struct {
 		baseDir  string
 		expected []string

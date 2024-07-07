@@ -8,12 +8,16 @@ import (
 )
 
 func TestApp_Run_Dependencies(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
 	cases := []struct {
 		args     []string
 		expected string
 	}{
 		{
-			args:     []string{"dependencies", "--state-dirs", "env/prd", "--base-dir=testdata/terraform", "--enable-tf=false", "--format=json"},
+			args:     []string{"dependencies", "--state-dirs", "env/prd", "--base-dir=testdata/terraform", "--format=json"},
 			expected: "[\"module/bar\",\"module/baz\",\"module/foo\"]\n",
 		},
 	}
@@ -34,12 +38,16 @@ func TestApp_Run_Dependencies(t *testing.T) {
 }
 
 func TestApp_Run_Dependents(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
 	cases := []struct {
 		args     []string
 		expected string
 	}{
 		{
-			args:     []string{"dependents", "--module-dirs", "module/foo", "--base-dir=testdata/terraform", "--enable-tf=false", "--format=text"},
+			args:     []string{"dependents", "--module-dirs", "module/foo", "--base-dir=testdata/terraform", "--format=text"},
 			expected: "env/dev env/prd env/stg\n",
 		},
 	}
