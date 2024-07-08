@@ -16,18 +16,34 @@ const maxConcurrentJobs = 10
 
 type Terraform struct {
 	baseDir *dir.BaseDir
+	filter  *TerraformDirFilter
 	enable  bool
 }
 
 func NewTerraform(baseDir *dir.BaseDir, enable bool) *Terraform {
 	return &Terraform{
 		baseDir: baseDir,
+		filter:  NewTerraformDirFilter(baseDir),
 		enable:  enable,
 	}
 }
 
+type TerraformDirFilter struct {
+	baseDir *dir.BaseDir
+}
+
+func NewTerraformDirFilter(baseDir *dir.BaseDir) *TerraformDirFilter {
+	return &TerraformDirFilter{
+		baseDir: baseDir,
+	}
+}
+
+func (t *TerraformDirFilter) SubDirs() ([]*dir.Dir, error) {
+	return t.baseDir.FilterSubDirs(".tf", filepath.Dir(TerraformModulesPath))
+}
+
 func (t *Terraform) GetAll() ([]*dir.Dir, error) {
-	sourceDirs, err := t.baseDir.FilterSubDirs(".tf", filepath.Dir(TerraformModulesPath))
+	sourceDirs, err := t.filter.SubDirs()
 	if err != nil {
 		return nil, err
 	}

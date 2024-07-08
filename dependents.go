@@ -48,8 +48,8 @@ func (r *DependentsRunner) List() ([]string, error) {
 	log.Printf("Runner flags: %#v", r.flags)
 
 	baseDir := r.flags.GetBaseDir()
-	terraform := NewTerraform(baseDir, r.flags.EnableTf)
-	sourceDirs, err := terraform.GetAll()
+	filter := NewTerraformDirFilter(baseDir)
+	sourceDirs, err := filter.SubDirs()
 	if err != nil {
 		return nil, err
 	}
