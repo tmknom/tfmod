@@ -47,7 +47,6 @@ func (a *App) Run(args []string) error {
 
 	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.BaseDir, "base-dir", "b", ".", "base directory")
 	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.Format, "format", "f", format.TextFormat, fmt.Sprintf("output format: %s", format.SupportType()))
-	a.rootCmd.PersistentFlags().BoolVar(&a.GlobalFlags.EnableTf, "enable-tf", true, "enable terraform command")
 	a.rootCmd.PersistentFlags().BoolVar(&a.GlobalFlags.Debug, "debug", false, "show debugging output")
 
 	a.rootCmd.AddCommand(a.newGetCommand())
@@ -65,7 +64,6 @@ func (a *App) newGetCommand() *cobra.Command {
 		Short: "Run terraform get",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
 	}
-	//command.PersistentFlags().StringSliceVarP(&flags.StateDirs, "state-dirs", "s", []string{}, "state dirs")
 	return command
 }
 
@@ -124,10 +122,9 @@ func (a *App) setupLog(name string, args []string) {
 }
 
 type GlobalFlags struct {
-	BaseDir  string
-	Format   string
-	EnableTf bool
-	Debug    bool
+	BaseDir string
+	Format  string
+	Debug   bool
 }
 
 func (f *GlobalFlags) GetBaseDir() *dir.BaseDir {
