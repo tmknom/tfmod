@@ -1,45 +1,28 @@
-package tfmod
+package terraform
 
 import (
 	"bytes"
 	"fmt"
 	"log"
 	"os/exec"
-	"path/filepath"
 	"sync"
 
 	"github.com/tmknom/tfmod/internal/dir"
 	"github.com/tmknom/tfmod/internal/errlib"
 )
 
-const maxConcurrentJobs = 10
-
 type Terraform struct {
 	baseDir *dir.BaseDir
-	filter  *TerraformDirFilter
+	filter  *Filter
 	enable  bool
 }
 
 func NewTerraform(baseDir *dir.BaseDir, enable bool) *Terraform {
 	return &Terraform{
 		baseDir: baseDir,
-		filter:  NewTerraformDirFilter(baseDir),
+		filter:  NewFilter(baseDir),
 		enable:  enable,
 	}
-}
-
-type TerraformDirFilter struct {
-	baseDir *dir.BaseDir
-}
-
-func NewTerraformDirFilter(baseDir *dir.BaseDir) *TerraformDirFilter {
-	return &TerraformDirFilter{
-		baseDir: baseDir,
-	}
-}
-
-func (t *TerraformDirFilter) SubDirs() ([]*dir.Dir, error) {
-	return t.baseDir.FilterSubDirs(".tf", filepath.Dir(TerraformModulesPath))
 }
 
 func (t *Terraform) GetAll() ([]*dir.Dir, error) {

@@ -9,6 +9,7 @@ import (
 
 	"github.com/tmknom/tfmod/internal/dir"
 	"github.com/tmknom/tfmod/internal/errlib"
+	"github.com/tmknom/tfmod/internal/terraform"
 )
 
 type Parser struct {
@@ -23,7 +24,7 @@ func NewParser(store Store) *Parser {
 
 func (p *Parser) ParseAll(sourceDirs []*dir.Dir) error {
 	for _, sourceDir := range sourceDirs {
-		raw, err := os.ReadFile(filepath.Join(sourceDir.Abs(), TerraformModulesPath))
+		raw, err := os.ReadFile(filepath.Join(sourceDir.Abs(), terraform.ModulesJsonPath))
 		if err != nil {
 			return errlib.Wrapf(err, "not readfile")
 		}
@@ -50,7 +51,7 @@ func (p *Parser) Parse(sourceDir *dir.Dir, raw []byte) ([]*ModuleDir, error) {
 	relModuleDirs := make([]*ModuleDir, 0, len(terraformModulesJson.Modules))
 	for _, module := range terraformModulesJson.Modules {
 		rawDir := module.Dir
-		if rawDir == "." || strings.Contains(rawDir, filepath.Dir(TerraformModulesPath)) {
+		if rawDir == terraform.RootModuleDir || strings.Contains(rawDir, terraform.ModulesDir) {
 			continue
 		}
 		moduleDir := NewModuleDir(filepath.Join(sourceDir.Abs(), rawDir), sourceDir.BaseDir())
@@ -72,7 +73,3 @@ type TerraformModule struct {
 type TerraformModulesJson struct {
 	Modules []TerraformModule `json:"Modules"`
 }
-
-const (
-	TerraformModulesPath = ".terraform/modules/modules.json"
-)

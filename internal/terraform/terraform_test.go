@@ -1,4 +1,4 @@
-package tfmod
+package terraform
 
 import (
 	"testing"
@@ -16,7 +16,7 @@ func TestTerraform_GetAll(t *testing.T) {
 		expected []string
 	}{
 		{
-			baseDir:  "testdata/terraform/env",
+			baseDir:  "../../testdata/terraform/env",
 			expected: []string{"dev", "prd", "stg"},
 		},
 	}

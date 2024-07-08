@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/tmknom/tfmod/internal/format"
+	"github.com/tmknom/tfmod/internal/terraform"
 )
 
 type DependenciesRunner struct {
@@ -48,7 +49,7 @@ func (r *DependenciesRunner) List() ([]string, error) {
 	log.Printf("Runner flags: %#v", r.flags)
 
 	baseDir := r.flags.GetBaseDir()
-	filter := NewTerraformDirFilter(baseDir)
+	filter := terraform.NewFilter(baseDir)
 	sourceDirs, err := filter.SubDirs()
 	if err != nil {
 		return nil, err
