@@ -28,6 +28,14 @@ func (d *BaseDir) CreateDir(raw string) *Dir {
 	return NewDir(raw, d)
 }
 
+func (d *BaseDir) ConvertDirs(dirs []string) []*Dir {
+	result := make([]*Dir, 0, len(dirs))
+	for _, dir := range dirs {
+		result = append(result, d.CreateDir(dir))
+	}
+	return result
+}
+
 func (d *BaseDir) Abs() string {
 	if d.abs != "" {
 		return d.abs
