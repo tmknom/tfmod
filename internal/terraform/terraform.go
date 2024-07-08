@@ -11,35 +11,13 @@ import (
 	"github.com/tmknom/tfmod/internal/errlib"
 )
 
-type Terraform struct {
-	baseDir *dir.BaseDir
-	filter  *Filter
-	enable  bool
+type Terraform struct{}
+
+func NewTerraform() *Terraform {
+	return &Terraform{}
 }
 
-func NewTerraform(baseDir *dir.BaseDir, enable bool) *Terraform {
-	return &Terraform{
-		baseDir: baseDir,
-		filter:  NewFilter(baseDir),
-		enable:  enable,
-	}
-}
-
-func (t *Terraform) GetAll() ([]*dir.Dir, error) {
-	sourceDirs, err := t.filter.SubDirs()
-	if err != nil {
-		return nil, err
-	}
-	log.Printf("Source dirs: %v", sourceDirs)
-
-	err = t.executeGetAll(sourceDirs)
-	if err != nil {
-		return nil, err
-	}
-	return sourceDirs, nil
-}
-
-func (t *Terraform) executeGetAll(workDirs []*dir.Dir) error {
+func (t *Terraform) GetAll(workDirs []*dir.Dir) error {
 	jobs := make(chan string, len(workDirs))
 	var wg sync.WaitGroup
 
@@ -75,10 +53,6 @@ func (t *Terraform) executeGet(workDir string) error {
 	cmd.Stderr = &bytes.Buffer{}
 
 	info := fmt.Sprintf("%s (at %s)\n", cmd.String(), cmd.Dir)
-	if !t.enable {
-		log.Printf(fmt.Sprintf("skip: %s", info))
-		return nil
-	}
 	log.Printf(fmt.Sprintf("execute: %s", info))
 
 	err := cmd.Run()

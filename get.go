@@ -47,8 +47,15 @@ func (r *GetRunner) Run() error {
 func (r *GetRunner) TerraformGet() ([]string, error) {
 	log.Printf("Runner flags: %#v", r.flags)
 
-	terraformCommand := terraform.NewTerraform(r.flags.GetBaseDir(), r.flags.EnableTf)
-	sourceDirs, err := terraformCommand.GetAll()
+	baseDir := r.flags.GetBaseDir()
+	filter := terraform.NewFilter(baseDir)
+	sourceDirs, err := filter.SubDirs()
+	if err != nil {
+		return nil, err
+	}
+
+	terraformCommand := terraform.NewTerraform()
+	err = terraformCommand.GetAll(sourceDirs)
 	if err != nil {
 		return nil, err
 	}
