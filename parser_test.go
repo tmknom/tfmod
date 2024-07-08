@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/tmknom/tfmod/internal/dir"
+	"github.com/tmknom/tfmod/internal/terraform"
 )
 
 func TestParser_Parse(t *testing.T) {
@@ -58,7 +59,7 @@ func (s *FakeParserStore) Actual() []string {
 	return s.list
 }
 
-func (s *FakeParserStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
+func (s *FakeParserStore) Save(moduleDir *terraform.ModuleDir, tfDir *terraform.TfDir) {
 	pair := strings.Join([]string{moduleDir.Rel(), tfDir.Rel()}, ":")
 	s.list = append(s.list, pair)
 }

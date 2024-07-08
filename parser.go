@@ -23,7 +23,7 @@ func NewParser(store ParserStore) *Parser {
 }
 
 type ParserStore interface {
-	Save(moduleDir *ModuleDir, tfDir *TfDir)
+	Save(moduleDir *terraform.ModuleDir, tfDir *terraform.TfDir)
 }
 
 func (p *Parser) ParseAll(sourceDirs []*dir.Dir) error {
@@ -39,26 +39,26 @@ func (p *Parser) ParseAll(sourceDirs []*dir.Dir) error {
 		}
 
 		for _, moduleDir := range moduleDirs {
-			p.ParserStore.Save(moduleDir, NewTfDir(sourceDir.Rel(), sourceDir.BaseDir()))
+			p.ParserStore.Save(moduleDir, terraform.NewTfDir(sourceDir.Rel(), sourceDir.BaseDir()))
 		}
 	}
 	return nil
 }
 
-func (p *Parser) Parse(sourceDir *dir.Dir, raw []byte) ([]*ModuleDir, error) {
+func (p *Parser) Parse(sourceDir *dir.Dir, raw []byte) ([]*terraform.ModuleDir, error) {
 	var terraformModulesJson TerraformModulesJson
 	err := json.Unmarshal(raw, &terraformModulesJson)
 	if err != nil {
 		return nil, errlib.Wrapf(err, "invalid json: %s", string(raw))
 	}
 
-	relModuleDirs := make([]*ModuleDir, 0, len(terraformModulesJson.Modules))
+	relModuleDirs := make([]*terraform.ModuleDir, 0, len(terraformModulesJson.Modules))
 	for _, module := range terraformModulesJson.Modules {
 		rawDir := module.Dir
 		if rawDir == terraform.RootModuleDir || strings.Contains(rawDir, terraform.ModulesDir) {
 			continue
 		}
-		moduleDir := NewModuleDir(filepath.Join(sourceDir.Abs(), rawDir), sourceDir.BaseDir())
+		moduleDir := terraform.NewModuleDir(filepath.Join(sourceDir.Abs(), rawDir), sourceDir.BaseDir())
 		relModuleDirs = append(relModuleDirs, moduleDir)
 	}
 

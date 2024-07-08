@@ -5,28 +5,29 @@ import (
 
 	"github.com/tmknom/tfmod/internal/collection"
 	"github.com/tmknom/tfmod/internal/dir"
+	"github.com/tmknom/tfmod/internal/terraform"
 )
 
 type Store interface {
-	Save(moduleDir *ModuleDir, tfDir *TfDir)
+	Save(moduleDir *terraform.ModuleDir, tfDir *terraform.TfDir)
 	ListTfDirs(moduleDirs []*dir.Dir) []string
 	ListModuleDirs(stateDirs []*dir.Dir) []string
 	Dump()
 }
 
 type InMemoryStore struct {
-	*DependencyMap
-	*DependentMap
+	*terraform.DependencyMap
+	*terraform.DependentMap
 }
 
 func NewInMemoryStore() *InMemoryStore {
 	return &InMemoryStore{
-		DependencyMap: NewDependencyMap(),
-		DependentMap:  NewDependentMap(),
+		DependencyMap: terraform.NewDependencyMap(),
+		DependentMap:  terraform.NewDependentMap(),
 	}
 }
 
-func (s *InMemoryStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
+func (s *InMemoryStore) Save(moduleDir *terraform.ModuleDir, tfDir *terraform.TfDir) {
 	s.DependencyMap.Add(tfDir, moduleDir)
 	s.DependentMap.Add(moduleDir, tfDir)
 }

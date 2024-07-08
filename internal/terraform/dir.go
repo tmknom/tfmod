@@ -1,4 +1,4 @@
-package tfmod
+package terraform
 
 import (
 	"github.com/tmknom/tfmod/internal/dir"
