@@ -24,6 +24,18 @@ func NewBaseDir(raw string) *BaseDir {
 	}
 }
 
+func (d *BaseDir) CreateDir(raw string) *Dir {
+	return NewDir(raw, d)
+}
+
+func (d *BaseDir) ConvertDirs(dirs []string) []*Dir {
+	result := make([]*Dir, 0, len(dirs))
+	for _, dir := range dirs {
+		result = append(result, d.CreateDir(dir))
+	}
+	return result
+}
+
 func (d *BaseDir) Abs() string {
 	if d.abs != "" {
 		return d.abs
@@ -69,7 +81,7 @@ func (d *BaseDir) FilterSubDirs(ext string, exclude string) ([]*Dir, error) {
 
 	result := make([]*Dir, 0, 64)
 	for _, absDir := range absDirs.Slice() {
-		result = append(result, NewDir(absDir, d))
+		result = append(result, d.CreateDir(absDir))
 	}
 	return result, nil
 }

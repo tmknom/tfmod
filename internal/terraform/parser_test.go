@@ -1,4 +1,4 @@
-package tfmod
+package terraform
 
 import (
 	"os"
@@ -10,7 +10,7 @@ import (
 )
 
 func TestParser_Parse(t *testing.T) {
-	store := &ParserFakeStore{}
+	store := &FakeParserStore{}
 	parser := NewParser(store)
 	moduleJson := `
 {
@@ -36,9 +36,9 @@ func TestParser_Parse(t *testing.T) {
 
 	currentDir, _ := os.Getwd()
 	baseDir := dir.NewBaseDir(currentDir)
-	actual, err := parser.Parse(dir.NewDir("env/dev", baseDir), []byte(moduleJson))
+	actual, err := parser.Parse(baseDir.CreateDir("env/dev"), []byte(moduleJson))
 	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+		t.Fatalf("unexpected error:\n input: %v\n error: %+v", moduleJson, err)
 	}
 
 	expected := []string{"module/bar", "module/foo"}
@@ -49,26 +49,16 @@ func TestParser_Parse(t *testing.T) {
 	}
 }
 
-type ParserFakeStore struct {
+type FakeParserStore struct {
 	list []string
 }
 
-func (s *ParserFakeStore) Actual() []string {
+func (s *FakeParserStore) Actual() []string {
 	sort.Strings(s.list)
 	return s.list
 }
 
-func (s *ParserFakeStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
+func (s *FakeParserStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
 	pair := strings.Join([]string{moduleDir.Rel(), tfDir.Rel()}, ":")
 	s.list = append(s.list, pair)
 }
-
-func (s *ParserFakeStore) ListTfDirs(moduleDirs []string) []string {
-	return nil
-}
-
-func (s *ParserFakeStore) ListModuleDirs(stateDirs []string) []string {
-	return nil
-}
-
-func (s *ParserFakeStore) Dump() {}

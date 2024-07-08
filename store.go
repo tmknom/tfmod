@@ -4,39 +4,42 @@ import (
 	"log"
 
 	"github.com/tmknom/tfmod/internal/collection"
+	"github.com/tmknom/tfmod/internal/dir"
+	"github.com/tmknom/tfmod/internal/terraform"
 )
 
 type Store interface {
-	Save(moduleDir *ModuleDir, tfDir *TfDir)
-	ListTfDirs(moduleDirs []string) []string
-	ListModuleDirs(stateDirs []string) []string
+	Save(moduleDir *terraform.ModuleDir, tfDir *terraform.TfDir)
+	ListTfDirs(moduleDirs []*dir.Dir) []string
+	ListModuleDirs(stateDirs []*dir.Dir) []string
 	Dump()
 }
 
 type InMemoryStore struct {
-	*DependencyMap
-	*DependentMap
+	*terraform.DependencyGraph
+	*terraform.DependentGraph
 }
 
 func NewInMemoryStore() *InMemoryStore {
 	return &InMemoryStore{
-		DependencyMap: NewDependencyMap(),
-		DependentMap:  NewDependentMap(),
+		DependencyGraph: terraform.NewDependencyGraph(),
+		DependentGraph:  terraform.NewDependentGraph(),
 	}
 }
 
-func (s *InMemoryStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
-	s.DependencyMap.Add(tfDir, moduleDir)
-	s.DependentMap.Add(moduleDir, tfDir)
+func (s *InMemoryStore) Save(moduleDir *terraform.ModuleDir, tfDir *terraform.TfDir) {
+	s.DependencyGraph.Add(tfDir, moduleDir)
+	s.DependentGraph.Add(moduleDir, tfDir)
 }
 
-func (s *InMemoryStore) ListTfDirs(moduleDirs []string) []string {
+func (s *InMemoryStore) ListTfDirs(moduleDirs []*dir.Dir) []string {
 	result := collection.NewTreeSet()
 
 	for _, moduleDir := range moduleDirs {
-		tfDirs := s.DependentMap.ListDst(moduleDir)
+		src := terraform.NewModuleDir(moduleDir.Rel(), moduleDir.BaseDir())
+		tfDirs := s.DependentGraph.ListDst(src)
 		for _, tfDir := range tfDirs {
-			if !s.DependentMap.IsModule(tfDir.Rel()) {
+			if !s.DependentGraph.IsModule(tfDir) {
 				result.Add(tfDir.Rel())
 			}
 		}
@@ -45,11 +48,12 @@ func (s *InMemoryStore) ListTfDirs(moduleDirs []string) []string {
 	return result.Slice()
 }
 
-func (s *InMemoryStore) ListModuleDirs(stateDirs []string) []string {
+func (s *InMemoryStore) ListModuleDirs(stateDirs []*dir.Dir) []string {
 	result := collection.NewTreeSet()
 
-	for _, dir := range stateDirs {
-		moduleDirs := s.DependencyMap.ListDst(dir)
+	for _, stateDir := range stateDirs {
+		src := terraform.NewTfDir(stateDir.Rel(), stateDir.BaseDir())
+		moduleDirs := s.DependencyGraph.ListDst(src)
 		for _, moduleDir := range moduleDirs {
 			result.Add(moduleDir.Rel())
 		}
@@ -59,6 +63,6 @@ func (s *InMemoryStore) ListModuleDirs(stateDirs []string) []string {
 }
 
 func (s *InMemoryStore) Dump() {
-	log.Printf("DependencyMap: %v", s.DependencyMap)
-	log.Printf("DependentMap: %v", s.DependentMap)
+	log.Printf("DependencyGraph: %v", s.DependencyGraph)
+	log.Printf("DependentGraph: %v", s.DependentGraph)
 }

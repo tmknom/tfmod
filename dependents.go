@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/tmknom/tfmod/internal/format"
+	"github.com/tmknom/tfmod/internal/terraform"
 )
 
 type DependentsRunner struct {
@@ -47,20 +48,21 @@ func (r *DependentsRunner) Run() error {
 func (r *DependentsRunner) List() ([]string, error) {
 	log.Printf("Runner flags: %#v", r.flags)
 
-	terraform := NewTerraform(r.flags.GetBaseDir(), r.flags.EnableTf)
-	sourceDirs, err := terraform.GetAll()
+	baseDir := r.flags.GetBaseDir()
+	filter := terraform.NewFilter(baseDir)
+	sourceDirs, err := filter.SubDirs()
 	if err != nil {
 		return nil, err
 	}
 
-	parser := NewParser(r.Store)
+	parser := terraform.NewParser(r.Store)
 	err = parser.ParseAll(sourceDirs)
 	if err != nil {
 		return nil, err
 	}
 
 	r.Store.Dump()
-	result := r.Store.ListTfDirs(r.flags.ModuleDirs)
+	result := r.Store.ListTfDirs(baseDir.ConvertDirs(r.flags.ModuleDirs))
 	log.Printf("Write stdout from: %#v", result)
 
 	return result, nil

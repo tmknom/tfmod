@@ -1,4 +1,4 @@
-package tfmod
+package terraform
 
 import (
 	"encoding/json"
@@ -12,18 +12,22 @@ import (
 )
 
 type Parser struct {
-	Store
+	ParserStore
 }
 
-func NewParser(store Store) *Parser {
+func NewParser(store ParserStore) *Parser {
 	return &Parser{
-		Store: store,
+		ParserStore: store,
 	}
+}
+
+type ParserStore interface {
+	Save(moduleDir *ModuleDir, tfDir *TfDir)
 }
 
 func (p *Parser) ParseAll(sourceDirs []*dir.Dir) error {
 	for _, sourceDir := range sourceDirs {
-		raw, err := os.ReadFile(filepath.Join(sourceDir.Abs(), TerraformModulesPath))
+		raw, err := os.ReadFile(filepath.Join(sourceDir.Abs(), ModulesJsonPath))
 		if err != nil {
 			return errlib.Wrapf(err, "not readfile")
 		}
@@ -34,7 +38,7 @@ func (p *Parser) ParseAll(sourceDirs []*dir.Dir) error {
 		}
 
 		for _, moduleDir := range moduleDirs {
-			p.Store.Save(moduleDir, NewTfDir(sourceDir.Rel(), sourceDir.BaseDir()))
+			p.ParserStore.Save(moduleDir, NewTfDir(sourceDir.Rel(), sourceDir.BaseDir()))
 		}
 	}
 	return nil
@@ -50,7 +54,7 @@ func (p *Parser) Parse(sourceDir *dir.Dir, raw []byte) ([]*ModuleDir, error) {
 	relModuleDirs := make([]*ModuleDir, 0, len(terraformModulesJson.Modules))
 	for _, module := range terraformModulesJson.Modules {
 		rawDir := module.Dir
-		if rawDir == "." || strings.Contains(rawDir, filepath.Dir(TerraformModulesPath)) {
+		if rawDir == RootModuleDir || strings.Contains(rawDir, ModulesDir) {
 			continue
 		}
 		moduleDir := NewModuleDir(filepath.Join(sourceDir.Abs(), rawDir), sourceDir.BaseDir())
@@ -72,7 +76,3 @@ type TerraformModule struct {
 type TerraformModulesJson struct {
 	Modules []TerraformModule `json:"Modules"`
 }
-
-const (
-	TerraformModulesPath = ".terraform/modules/modules.json"
-)
