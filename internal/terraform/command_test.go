@@ -25,7 +25,7 @@ func TestTerraform_GetAll(t *testing.T) {
 
 		err := sut.GetAll(baseDir.ConvertDirs(tc.inputs))
 		if err != nil {
-			t.Errorf("%v: unexpected error: %e", tc.inputs, err)
+			t.Fatalf("unexpected error:\n input: %v\n error: %+v", tc.inputs, err)
 		}
 	}
 }

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestBaseDir_Abs(t *testing.T) {
@@ -42,16 +44,11 @@ func TestBaseDir_FilterSubDirs(t *testing.T) {
 
 	actual, err := sut.FilterSubDirs(".tf", ".terraform")
 	if err != nil {
-		t.Fatalf("unexpected error: %#v", err)
+		t.Fatalf("unexpected error: %+v", err)
 	}
 
 	expected := []string{"dev", "prd", "stg"}
-	if len(expected) != len(actual) {
-		t.Fatalf("diff length, expected: %v, actual: %v", expected, actual)
-	}
-	for i, item := range expected {
-		if item != actual[i].Rel() {
-			t.Errorf("diff index: %d, expected: %v, actual: %v", i, expected, actual)
-		}
+	if diff := cmp.Diff(expected, Dirs(actual).Slice()); diff != "" {
+		t.Errorf("expected: %v, actual: %v", expected, actual)
 	}
 }

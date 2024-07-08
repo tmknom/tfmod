@@ -38,7 +38,7 @@ func TestParser_Parse(t *testing.T) {
 	baseDir := dir.NewBaseDir(currentDir)
 	actual, err := parser.Parse(baseDir.CreateDir("env/dev"), []byte(moduleJson))
 	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+		t.Fatalf("unexpected error:\n input: %v\n error: %+v", moduleJson, err)
 	}
 
 	expected := []string{"module/bar", "module/foo"}

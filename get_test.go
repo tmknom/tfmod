@@ -10,11 +10,11 @@ import (
 
 func TestGetRunner_List(t *testing.T) {
 	cases := []struct {
-		baseDir  string
+		input    string
 		expected []string
 	}{
 		{
-			baseDir:  "testdata/terraform/env",
+			input:    "testdata/terraform/env",
 			expected: []string{"dev", "prd", "stg"},
 		},
 	}
@@ -23,7 +23,7 @@ func TestGetRunner_List(t *testing.T) {
 		bufIO := &IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}
 		flags := &GetFlags{
 			GlobalFlags: &GlobalFlags{
-				BaseDir:  tc.baseDir,
+				BaseDir:  tc.input,
 				EnableTf: false,
 				Debug:    true,
 			},
@@ -32,11 +32,11 @@ func TestGetRunner_List(t *testing.T) {
 
 		actual, err := runner.TerraformGet()
 		if err != nil {
-			t.Fatalf("%v: unexpected error: %e", tc.baseDir, err)
+			t.Fatalf("unexpected error:\n input: %v\n error: %+v", tc.input, err)
 		}
 
 		if diff := cmp.Diff(tc.expected, actual); diff != "" {
-			t.Errorf("flags: %#v, expected: %v, actual: %v", flags.GlobalFlags, tc.expected, actual)
+			t.Errorf("input: %#v, expected: %v, actual: %v", flags.GlobalFlags, tc.expected, actual)
 		}
 	}
 }

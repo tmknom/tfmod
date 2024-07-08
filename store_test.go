@@ -9,15 +9,15 @@ import (
 
 func TestInMemoryStore_ListModuleDirs(t *testing.T) {
 	cases := []struct {
-		dirs     []string
+		inputs   []string
 		expected []string
 	}{
 		{
-			dirs:     []string{"env/dev"},
+			inputs:   []string{"env/dev"},
 			expected: []string{"module/bar", "module/foo"},
 		},
 		{
-			dirs:     []string{"env/dev", "env/prd"},
+			inputs:   []string{"env/dev", "env/prd"},
 			expected: []string{"module/bar", "module/baz", "module/foo"},
 		},
 	}
@@ -30,25 +30,25 @@ func TestInMemoryStore_ListModuleDirs(t *testing.T) {
 	sut.Save(NewModuleDir("module/baz", baseDir), NewTfDir("env/prd", baseDir))
 
 	for _, tc := range cases {
-		actual := sut.ListModuleDirs(baseDir.ConvertDirs(tc.dirs))
+		actual := sut.ListModuleDirs(baseDir.ConvertDirs(tc.inputs))
 
 		if diff := cmp.Diff(tc.expected, actual); diff != "" {
-			t.Errorf("dirs: %v, expected: %v, actual: %v", tc.dirs, tc.expected, actual)
+			t.Errorf("input: %v, expected: %v, actual: %v", tc.inputs, tc.expected, actual)
 		}
 	}
 }
 
 func TestInMemoryStore_ListTfDirs(t *testing.T) {
 	cases := []struct {
-		dirs     []string
+		inputs   []string
 		expected []string
 	}{
 		{
-			dirs:     []string{"module/foo"},
+			inputs:   []string{"module/foo"},
 			expected: []string{"env/dev", "env/prd", "env/stg"},
 		},
 		{
-			dirs:     []string{"module/bar", "module/baz"},
+			inputs:   []string{"module/bar", "module/baz"},
 			expected: []string{"env/dev", "env/prd"},
 		},
 	}
@@ -62,10 +62,10 @@ func TestInMemoryStore_ListTfDirs(t *testing.T) {
 	sut.Save(NewModuleDir("module/baz", baseDir), NewTfDir("env/prd", baseDir))
 
 	for _, tc := range cases {
-		actual := sut.ListTfDirs(baseDir.ConvertDirs(tc.dirs))
+		actual := sut.ListTfDirs(baseDir.ConvertDirs(tc.inputs))
 
 		if diff := cmp.Diff(tc.expected, actual); diff != "" {
-			t.Errorf("dirs: %v, expected: %v, actual: %v", tc.dirs, tc.expected, actual)
+			t.Errorf("input: %v, expected: %v, actual: %v", tc.inputs, tc.expected, actual)
 		}
 	}
 }
