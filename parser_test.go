@@ -10,7 +10,7 @@ import (
 )
 
 func TestParser_Parse(t *testing.T) {
-	store := &ParserFakeStore{}
+	store := &FakeParserStore{}
 	parser := NewParser(store)
 	moduleJson := `
 {
@@ -49,26 +49,16 @@ func TestParser_Parse(t *testing.T) {
 	}
 }
 
-type ParserFakeStore struct {
+type FakeParserStore struct {
 	list []string
 }
 
-func (s *ParserFakeStore) Actual() []string {
+func (s *FakeParserStore) Actual() []string {
 	sort.Strings(s.list)
 	return s.list
 }
 
-func (s *ParserFakeStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
+func (s *FakeParserStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
 	pair := strings.Join([]string{moduleDir.Rel(), tfDir.Rel()}, ":")
 	s.list = append(s.list, pair)
 }
-
-func (s *ParserFakeStore) ListTfDirs(moduleDirs []*dir.Dir) []string {
-	return nil
-}
-
-func (s *ParserFakeStore) ListModuleDirs(stateDirs []*dir.Dir) []string {
-	return nil
-}
-
-func (s *ParserFakeStore) Dump() {}

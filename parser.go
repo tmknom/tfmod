@@ -13,13 +13,17 @@ import (
 )
 
 type Parser struct {
-	Store
+	ParserStore
 }
 
-func NewParser(store Store) *Parser {
+func NewParser(store ParserStore) *Parser {
 	return &Parser{
-		Store: store,
+		ParserStore: store,
 	}
+}
+
+type ParserStore interface {
+	Save(moduleDir *ModuleDir, tfDir *TfDir)
 }
 
 func (p *Parser) ParseAll(sourceDirs []*dir.Dir) error {
@@ -35,7 +39,7 @@ func (p *Parser) ParseAll(sourceDirs []*dir.Dir) error {
 		}
 
 		for _, moduleDir := range moduleDirs {
-			p.Store.Save(moduleDir, NewTfDir(sourceDir.Rel(), sourceDir.BaseDir()))
+			p.ParserStore.Save(moduleDir, NewTfDir(sourceDir.Rel(), sourceDir.BaseDir()))
 		}
 	}
 	return nil
