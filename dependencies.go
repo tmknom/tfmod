@@ -55,7 +55,7 @@ func (r *DependenciesRunner) List() ([]string, error) {
 		return nil, err
 	}
 
-	parser := NewParser(r.Store)
+	parser := terraform.NewParser(r.Store)
 	err = parser.ParseAll(sourceDirs)
 	if err != nil {
 		return nil, err

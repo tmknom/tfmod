@@ -1,4 +1,4 @@
-package tfmod
+package terraform
 
 import (
 	"encoding/json"
@@ -9,7 +9,6 @@ import (
 
 	"github.com/tmknom/tfmod/internal/dir"
 	"github.com/tmknom/tfmod/internal/errlib"
-	"github.com/tmknom/tfmod/internal/terraform"
 )
 
 type Parser struct {
@@ -23,12 +22,12 @@ func NewParser(store ParserStore) *Parser {
 }
 
 type ParserStore interface {
-	Save(moduleDir *terraform.ModuleDir, tfDir *terraform.TfDir)
+	Save(moduleDir *ModuleDir, tfDir *TfDir)
 }
 
 func (p *Parser) ParseAll(sourceDirs []*dir.Dir) error {
 	for _, sourceDir := range sourceDirs {
-		raw, err := os.ReadFile(filepath.Join(sourceDir.Abs(), terraform.ModulesJsonPath))
+		raw, err := os.ReadFile(filepath.Join(sourceDir.Abs(), ModulesJsonPath))
 		if err != nil {
 			return errlib.Wrapf(err, "not readfile")
 		}
@@ -39,26 +38,26 @@ func (p *Parser) ParseAll(sourceDirs []*dir.Dir) error {
 		}
 
 		for _, moduleDir := range moduleDirs {
-			p.ParserStore.Save(moduleDir, terraform.NewTfDir(sourceDir.Rel(), sourceDir.BaseDir()))
+			p.ParserStore.Save(moduleDir, NewTfDir(sourceDir.Rel(), sourceDir.BaseDir()))
 		}
 	}
 	return nil
 }
 
-func (p *Parser) Parse(sourceDir *dir.Dir, raw []byte) ([]*terraform.ModuleDir, error) {
+func (p *Parser) Parse(sourceDir *dir.Dir, raw []byte) ([]*ModuleDir, error) {
 	var terraformModulesJson TerraformModulesJson
 	err := json.Unmarshal(raw, &terraformModulesJson)
 	if err != nil {
 		return nil, errlib.Wrapf(err, "invalid json: %s", string(raw))
 	}
 
-	relModuleDirs := make([]*terraform.ModuleDir, 0, len(terraformModulesJson.Modules))
+	relModuleDirs := make([]*ModuleDir, 0, len(terraformModulesJson.Modules))
 	for _, module := range terraformModulesJson.Modules {
 		rawDir := module.Dir
-		if rawDir == terraform.RootModuleDir || strings.Contains(rawDir, terraform.ModulesDir) {
+		if rawDir == RootModuleDir || strings.Contains(rawDir, ModulesDir) {
 			continue
 		}
-		moduleDir := terraform.NewModuleDir(filepath.Join(sourceDir.Abs(), rawDir), sourceDir.BaseDir())
+		moduleDir := NewModuleDir(filepath.Join(sourceDir.Abs(), rawDir), sourceDir.BaseDir())
 		relModuleDirs = append(relModuleDirs, moduleDir)
 	}
 
