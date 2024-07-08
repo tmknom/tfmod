@@ -32,7 +32,7 @@ func TestGraph_AddAndListDst(t *testing.T) {
 	sut.Add(NewFakeSrcDir("src/baz"), NewFakeDstDir("dst/foo"))
 
 	for _, tc := range cases {
-		actual := sut.ListDst(tc.input)
+		actual := sut.ListDst(NewFakeSrcDir(tc.input))
 
 		if len(tc.expected) != len(actual) {
 			t.Fatalf("error length:\n input: %v, expected: %v, actual: %v\n graph: %v", tc.input, tc.expected, actual, sut)
@@ -66,7 +66,7 @@ func TestGraph_Include(t *testing.T) {
 	sut.Add(NewFakeSrcDir("src/baz"), NewFakeDstDir("dst/foo"))
 
 	for _, tc := range cases {
-		actual := sut.Include(tc.input)
+		actual := sut.Include(createNewDir(tc.input))
 		if actual != tc.expected {
 			t.Errorf("input: %v, expected: %v, actual: %v\n graph: %v", tc.input, tc.expected, actual, sut)
 		}
@@ -79,7 +79,7 @@ type FakeSrcDir struct {
 
 func NewFakeSrcDir(raw string) *FakeSrcDir {
 	return &FakeSrcDir{
-		Dir: NewDir(raw, NewBaseDir(".")),
+		Dir: createNewDir(raw),
 	}
 }
 
@@ -89,6 +89,10 @@ type FakeDstDir struct {
 
 func NewFakeDstDir(raw string) *FakeDstDir {
 	return &FakeDstDir{
-		Dir: NewDir(raw, NewBaseDir(".")),
+		Dir: createNewDir(raw),
 	}
+}
+
+func createNewDir(raw string) *Dir {
+	return NewDir(raw, NewBaseDir("."))
 }

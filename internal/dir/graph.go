@@ -17,13 +17,13 @@ func (d *Graph[SRC, DST]) Add(src *SRC, dst *DST) {
 	d.items[key] = append(d.items[key], dst)
 }
 
-func (d *Graph[SRC, DST]) Include(src string) bool {
-	_, ok := d.items[src]
+func (d *Graph[SRC, DST]) Include(src Path) bool {
+	_, ok := d.items[src.Rel()]
 	return ok
 }
 
-func (d *Graph[SRC, DST]) ListDst(src string) []*DST {
-	result, _ := d.items[src]
+func (d *Graph[SRC, DST]) ListDst(src *SRC) []*DST {
+	result, _ := d.items[(*src).Rel()]
 	return result
 }
 

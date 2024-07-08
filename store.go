@@ -36,9 +36,10 @@ func (s *InMemoryStore) ListTfDirs(moduleDirs []*dir.Dir) []string {
 	result := collection.NewTreeSet()
 
 	for _, moduleDir := range moduleDirs {
-		tfDirs := s.DependentGraph.ListDst(moduleDir.Rel())
+		src := terraform.NewModuleDir(moduleDir.Rel(), moduleDir.BaseDir())
+		tfDirs := s.DependentGraph.ListDst(src)
 		for _, tfDir := range tfDirs {
-			if !s.DependentGraph.IsModule(tfDir.Rel()) {
+			if !s.DependentGraph.IsModule(tfDir) {
 				result.Add(tfDir.Rel())
 			}
 		}
@@ -51,7 +52,8 @@ func (s *InMemoryStore) ListModuleDirs(stateDirs []*dir.Dir) []string {
 	result := collection.NewTreeSet()
 
 	for _, stateDir := range stateDirs {
-		moduleDirs := s.DependencyGraph.ListDst(stateDir.Rel())
+		src := terraform.NewTfDir(stateDir.Rel(), stateDir.BaseDir())
+		moduleDirs := s.DependencyGraph.ListDst(src)
 		for _, moduleDir := range moduleDirs {
 			result.Add(moduleDir.Rel())
 		}

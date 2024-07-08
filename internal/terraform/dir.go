@@ -34,8 +34,8 @@ func NewDependentGraph() *DependentGraph {
 	}
 }
 
-func (m *DependentGraph) IsModule(dir string) bool {
-	return m.Include(dir)
+func (m *DependentGraph) IsModule(src dir.Path) bool {
+	return m.Include(src)
 }
 
 type DependencyGraph struct {
