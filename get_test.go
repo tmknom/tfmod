@@ -23,9 +23,8 @@ func TestGetRunner_List(t *testing.T) {
 		bufIO := &IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}
 		flags := &GetFlags{
 			GlobalFlags: &GlobalFlags{
-				BaseDir:  tc.input,
-				EnableTf: false,
-				Debug:    true,
+				BaseDir: tc.input,
+				Debug:   true,
 			},
 		}
 		runner := NewGetRunner(flags, NewInMemoryStore(), bufIO)
