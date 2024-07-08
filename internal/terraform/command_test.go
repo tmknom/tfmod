@@ -21,7 +21,7 @@ func TestTerraform_GetAll(t *testing.T) {
 
 	baseDir := dir.NewBaseDir("testdata/terraform/env")
 	for _, tc := range cases {
-		sut := NewTerraform()
+		sut := NewCommand()
 
 		err := sut.GetAll(baseDir.ConvertDirs(tc.inputs))
 		if err != nil {

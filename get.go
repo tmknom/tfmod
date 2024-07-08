@@ -54,7 +54,7 @@ func (r *GetRunner) TerraformGet() ([]string, error) {
 		return nil, err
 	}
 
-	terraformCommand := terraform.NewTerraform()
+	terraformCommand := terraform.NewCommand()
 	err = terraformCommand.GetAll(sourceDirs)
 	if err != nil {
 		return nil, err

@@ -11,19 +11,19 @@ import (
 	"github.com/tmknom/tfmod/internal/errlib"
 )
 
-type Terraform struct{}
+type Command struct{}
 
-func NewTerraform() *Terraform {
-	return &Terraform{}
+func NewCommand() *Command {
+	return &Command{}
 }
 
-func (t *Terraform) GetAll(workDirs []*dir.Dir) error {
+func (c *Command) GetAll(workDirs []*dir.Dir) error {
 	jobs := make(chan string, len(workDirs))
 	var wg sync.WaitGroup
 
 	for i := 0; i < maxConcurrentJobs; i++ {
 		wg.Add(1)
-		go t.worker(jobs, &wg)
+		go c.worker(jobs, &wg)
 	}
 
 	for _, workDir := range workDirs {
@@ -36,17 +36,17 @@ func (t *Terraform) GetAll(workDirs []*dir.Dir) error {
 	return nil
 }
 
-func (t *Terraform) worker(jobs <-chan string, wg *sync.WaitGroup) {
+func (c *Command) worker(jobs <-chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for workDir := range jobs {
-		err := t.executeGet(workDir)
+		err := c.executeGet(workDir)
 		if err != nil {
 			log.Printf("Error terraform get in %s: %v\n", workDir, err)
 		}
 	}
 }
 
-func (t *Terraform) executeGet(workDir string) error {
+func (c *Command) executeGet(workDir string) error {
 	cmd := exec.Command("terraform", "get")
 	cmd.Dir = workDir
 	cmd.Stdout = &bytes.Buffer{}
