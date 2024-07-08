@@ -30,7 +30,7 @@ func TestInMemoryStore_ListModuleDirs(t *testing.T) {
 	sut.Save(NewModuleDir("module/baz", baseDir), NewTfDir("env/prd", baseDir))
 
 	for _, tc := range cases {
-		actual := sut.ListModuleDirs(tc.dirs)
+		actual := sut.ListModuleDirs(baseDir.ConvertDirs(tc.dirs))
 
 		if diff := cmp.Diff(tc.expected, actual); diff != "" {
 			t.Errorf("dirs: %v, expected: %v, actual: %v", tc.dirs, tc.expected, actual)
@@ -62,7 +62,7 @@ func TestInMemoryStore_ListTfDirs(t *testing.T) {
 	sut.Save(NewModuleDir("module/baz", baseDir), NewTfDir("env/prd", baseDir))
 
 	for _, tc := range cases {
-		actual := sut.ListTfDirs(tc.dirs)
+		actual := sut.ListTfDirs(baseDir.ConvertDirs(tc.dirs))
 
 		if diff := cmp.Diff(tc.expected, actual); diff != "" {
 			t.Errorf("dirs: %v, expected: %v, actual: %v", tc.dirs, tc.expected, actual)

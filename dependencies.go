@@ -47,7 +47,8 @@ func (r *DependenciesRunner) Run() error {
 func (r *DependenciesRunner) List() ([]string, error) {
 	log.Printf("Runner flags: %#v", r.flags)
 
-	terraform := NewTerraform(r.flags.GetBaseDir(), r.flags.EnableTf)
+	baseDir := r.flags.GetBaseDir()
+	terraform := NewTerraform(baseDir, r.flags.EnableTf)
 	sourceDirs, err := terraform.GetAll()
 	if err != nil {
 		return nil, err
@@ -60,7 +61,7 @@ func (r *DependenciesRunner) List() ([]string, error) {
 	}
 
 	r.Store.Dump()
-	result := r.Store.ListModuleDirs(r.flags.StateDirs)
+	result := r.Store.ListModuleDirs(baseDir.ConvertDirs(r.flags.StateDirs))
 	log.Printf("Result: %#v", result)
 
 	return result, nil

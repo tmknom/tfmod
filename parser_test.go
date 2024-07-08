@@ -63,11 +63,11 @@ func (s *ParserFakeStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
 	s.list = append(s.list, pair)
 }
 
-func (s *ParserFakeStore) ListTfDirs(moduleDirs []string) []string {
+func (s *ParserFakeStore) ListTfDirs(moduleDirs []*dir.Dir) []string {
 	return nil
 }
 
-func (s *ParserFakeStore) ListModuleDirs(stateDirs []string) []string {
+func (s *ParserFakeStore) ListModuleDirs(stateDirs []*dir.Dir) []string {
 	return nil
 }
 

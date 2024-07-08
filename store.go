@@ -4,12 +4,13 @@ import (
 	"log"
 
 	"github.com/tmknom/tfmod/internal/collection"
+	"github.com/tmknom/tfmod/internal/dir"
 )
 
 type Store interface {
 	Save(moduleDir *ModuleDir, tfDir *TfDir)
-	ListTfDirs(moduleDirs []string) []string
-	ListModuleDirs(stateDirs []string) []string
+	ListTfDirs(moduleDirs []*dir.Dir) []string
+	ListModuleDirs(stateDirs []*dir.Dir) []string
 	Dump()
 }
 
@@ -30,11 +31,11 @@ func (s *InMemoryStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
 	s.DependentMap.Add(moduleDir, tfDir)
 }
 
-func (s *InMemoryStore) ListTfDirs(moduleDirs []string) []string {
+func (s *InMemoryStore) ListTfDirs(moduleDirs []*dir.Dir) []string {
 	result := collection.NewTreeSet()
 
 	for _, moduleDir := range moduleDirs {
-		tfDirs := s.DependentMap.ListDst(moduleDir)
+		tfDirs := s.DependentMap.ListDst(moduleDir.Rel())
 		for _, tfDir := range tfDirs {
 			if !s.DependentMap.IsModule(tfDir.Rel()) {
 				result.Add(tfDir.Rel())
@@ -45,11 +46,11 @@ func (s *InMemoryStore) ListTfDirs(moduleDirs []string) []string {
 	return result.Slice()
 }
 
-func (s *InMemoryStore) ListModuleDirs(stateDirs []string) []string {
+func (s *InMemoryStore) ListModuleDirs(stateDirs []*dir.Dir) []string {
 	result := collection.NewTreeSet()
 
-	for _, dir := range stateDirs {
-		moduleDirs := s.DependencyMap.ListDst(dir)
+	for _, stateDir := range stateDirs {
+		moduleDirs := s.DependencyMap.ListDst(stateDir.Rel())
 		for _, moduleDir := range moduleDirs {
 			result.Add(moduleDir.Rel())
 		}
