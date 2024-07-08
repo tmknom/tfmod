@@ -24,17 +24,17 @@ func NewTfDir(raw string, baseDir *dir.BaseDir) *TfDir {
 	}
 }
 
-type DependentMap struct {
+type DependentGraph struct {
 	*dir.Graph[ModuleDir, TfDir]
 }
 
-func NewDependentMap() *DependentMap {
-	return &DependentMap{
+func NewDependentGraph() *DependentGraph {
+	return &DependentGraph{
 		Graph: dir.NewGraph[ModuleDir, TfDir](),
 	}
 }
 
-func (m *DependentMap) IsModule(dir string) bool {
+func (m *DependentGraph) IsModule(dir string) bool {
 	return m.Include(dir)
 }
 
