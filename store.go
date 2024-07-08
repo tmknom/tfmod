@@ -16,19 +16,19 @@ type Store interface {
 }
 
 type InMemoryStore struct {
-	*terraform.DependencyMap
+	*terraform.DependencyGraph
 	*terraform.DependentGraph
 }
 
 func NewInMemoryStore() *InMemoryStore {
 	return &InMemoryStore{
-		DependencyMap:  terraform.NewDependencyMap(),
-		DependentGraph: terraform.NewDependentGraph(),
+		DependencyGraph: terraform.NewDependencyGraph(),
+		DependentGraph:  terraform.NewDependentGraph(),
 	}
 }
 
 func (s *InMemoryStore) Save(moduleDir *terraform.ModuleDir, tfDir *terraform.TfDir) {
-	s.DependencyMap.Add(tfDir, moduleDir)
+	s.DependencyGraph.Add(tfDir, moduleDir)
 	s.DependentGraph.Add(moduleDir, tfDir)
 }
 
@@ -51,7 +51,7 @@ func (s *InMemoryStore) ListModuleDirs(stateDirs []*dir.Dir) []string {
 	result := collection.NewTreeSet()
 
 	for _, stateDir := range stateDirs {
-		moduleDirs := s.DependencyMap.ListDst(stateDir.Rel())
+		moduleDirs := s.DependencyGraph.ListDst(stateDir.Rel())
 		for _, moduleDir := range moduleDirs {
 			result.Add(moduleDir.Rel())
 		}
@@ -61,6 +61,6 @@ func (s *InMemoryStore) ListModuleDirs(stateDirs []*dir.Dir) []string {
 }
 
 func (s *InMemoryStore) Dump() {
-	log.Printf("DependencyMap: %v", s.DependencyMap)
+	log.Printf("DependencyGraph: %v", s.DependencyGraph)
 	log.Printf("DependentGraph: %v", s.DependentGraph)
 }

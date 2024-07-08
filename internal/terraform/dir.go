@@ -38,12 +38,12 @@ func (m *DependentGraph) IsModule(dir string) bool {
 	return m.Include(dir)
 }
 
-type DependencyMap struct {
+type DependencyGraph struct {
 	*dir.Graph[TfDir, ModuleDir]
 }
 
-func NewDependencyMap() *DependencyMap {
-	return &DependencyMap{
+func NewDependencyGraph() *DependencyGraph {
+	return &DependencyGraph{
 		Graph: dir.NewGraph[TfDir, ModuleDir](),
 	}
 }
