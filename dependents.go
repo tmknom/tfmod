@@ -10,11 +10,11 @@ import (
 
 type DependentsRunner struct {
 	flags *DependentsFlags
-	Store
+	terraform.Store
 	*IO
 }
 
-func NewDependentsRunner(flags *DependentsFlags, store Store, io *IO) *DependentsRunner {
+func NewDependentsRunner(flags *DependentsFlags, store terraform.Store, io *IO) *DependentsRunner {
 	return &DependentsRunner{
 		flags: flags,
 		Store: store,
@@ -62,7 +62,7 @@ func (r *DependentsRunner) List() ([]string, error) {
 	}
 
 	r.Store.Dump()
-	result := r.Store.ListTfDirs(baseDir.ConvertDirs(r.flags.ModuleDirs))
+	result := r.Store.List(baseDir.ConvertDirs(r.flags.ModuleDirs))
 	log.Printf("Write stdout from: %#v", result)
 
 	return result, nil

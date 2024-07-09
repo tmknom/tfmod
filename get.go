@@ -10,14 +10,12 @@ import (
 
 type GetRunner struct {
 	flags *GetFlags
-	Store
 	*IO
 }
 
-func NewGetRunner(flags *GetFlags, store Store, io *IO) *GetRunner {
+func NewGetRunner(flags *GetFlags, io *IO) *GetRunner {
 	return &GetRunner{
 		flags: flags,
-		Store: store,
 		IO:    io,
 	}
 }

@@ -10,11 +10,11 @@ import (
 
 type DependenciesRunner struct {
 	flags *DependenciesFlags
-	Store
+	terraform.Store
 	*IO
 }
 
-func NewDependenciesRunner(flags *DependenciesFlags, store Store, io *IO) *DependenciesRunner {
+func NewDependenciesRunner(flags *DependenciesFlags, store terraform.Store, io *IO) *DependenciesRunner {
 	return &DependenciesRunner{
 		flags: flags,
 		Store: store,
@@ -62,7 +62,7 @@ func (r *DependenciesRunner) List() ([]string, error) {
 	}
 
 	r.Store.Dump()
-	result := r.Store.ListModuleDirs(baseDir.ConvertDirs(r.flags.StateDirs))
+	result := r.Store.List(baseDir.ConvertDirs(r.flags.StateDirs))
 	log.Printf("Result: %#v", result)
 
 	return result, nil
