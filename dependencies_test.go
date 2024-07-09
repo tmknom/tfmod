@@ -5,24 +5,26 @@ import (
 	"os"
 	"testing"
 
+	"github.com/tmknom/tfmod/internal/testlib"
+
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestDependenciesRunner_List(t *testing.T) {
 	cases := []struct {
-		inputs   []string
+		input    []string
 		expected []string
 	}{
 		{
-			inputs:   []string{"env/dev"},
+			input:    []string{"env/dev"},
 			expected: []string{"module/foo"},
 		},
 		{
-			inputs:   []string{"env/dev", "env/stg"},
+			input:    []string{"env/dev", "env/stg"},
 			expected: []string{"module/foo"},
 		},
 		{
-			inputs:   []string{"env/prd"},
+			input:    []string{"env/prd"},
 			expected: []string{"module/bar", "module/baz", "module/foo"},
 		},
 	}
@@ -35,18 +37,18 @@ func TestDependenciesRunner_List(t *testing.T) {
 	for _, tc := range cases {
 		bufIO := &IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}
 		flags := &DependenciesFlags{
-			StateDirs:   tc.inputs,
+			StateDirs:   tc.input,
 			GlobalFlags: globalFlags,
 		}
-		runner := NewDependenciesRunner(flags, NewInMemoryStore(), bufIO)
+		sut := NewDependenciesRunner(flags, NewInMemoryStore(), bufIO)
 
-		actual, err := runner.List()
+		actual, err := sut.List()
 		if err != nil {
-			t.Fatalf("unexpected error:\n input: %v\n error: %+v", tc.inputs, err)
+			t.Fatalf(testlib.FormatError(err, sut, tc.input))
 		}
 
 		if diff := cmp.Diff(tc.expected, actual); diff != "" {
-			t.Errorf("input: %v, expected: %v, actual: %v", tc.inputs, tc.expected, actual)
+			t.Errorf(testlib.Format(sut, tc.expected, actual, tc.input))
 		}
 	}
 }
