@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/tmknom/tfmod/internal/testlib"
 )
 
 func TestTreeSet_AddAndSlice(t *testing.T) {
@@ -22,14 +23,14 @@ func TestTreeSet_AddAndSlice(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		set := NewTreeSet()
+		sut := NewTreeSet()
 		for _, item := range tc.items {
-			set.Add(item)
+			sut.Add(item)
 		}
 
-		actual := set.Slice()
+		actual := sut.Slice()
 		if diff := cmp.Diff(tc.expected, actual); diff != "" {
-			t.Errorf("expected: %v, actual: %v", tc.expected, actual)
+			t.Errorf(testlib.FormatWithoutInput(sut, tc.expected, actual))
 		}
 	}
 }
