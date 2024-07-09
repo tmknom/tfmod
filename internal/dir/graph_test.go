@@ -2,6 +2,8 @@ package dir
 
 import (
 	"testing"
+
+	"github.com/tmknom/tfmod/internal/testlib"
 )
 
 func TestGraph_AddAndListDst(t *testing.T) {
@@ -35,11 +37,11 @@ func TestGraph_AddAndListDst(t *testing.T) {
 		actual := sut.ListDst(NewFakeSrcDir(tc.input))
 
 		if len(tc.expected) != len(actual) {
-			t.Fatalf("error length:\n input: %v, expected: %v, actual: %v\n graph: %v", tc.input, tc.expected, actual, sut)
+			t.Fatalf("error length: %s", testlib.Format(sut, tc.expected, actual, tc.input))
 		}
 		for i, item := range tc.expected {
 			if item != actual[i].Rel() {
-				t.Errorf("error index:\n %d, input: %v, expected: %v, actual: %v\n graph: %v", i, tc.input, tc.expected, actual, sut)
+				t.Errorf("error index: %d %s", i, testlib.Format(sut, tc.expected, actual, tc.input))
 			}
 		}
 	}
@@ -68,7 +70,7 @@ func TestGraph_Include(t *testing.T) {
 	for _, tc := range cases {
 		actual := sut.Include(createNewDir(tc.input))
 		if actual != tc.expected {
-			t.Errorf("input: %v, expected: %v, actual: %v\n graph: %v", tc.input, tc.expected, actual, sut)
+			t.Errorf(testlib.Format(sut, tc.expected, actual, tc.input))
 		}
 	}
 }
