@@ -1,33 +1,32 @@
-package tfmod
+package terraform
 
 import (
 	"log"
 
 	"github.com/tmknom/tfmod/internal/collection"
 	"github.com/tmknom/tfmod/internal/dir"
-	"github.com/tmknom/tfmod/internal/terraform"
 )
 
 type Store interface {
-	Save(moduleDir *terraform.ModuleDir, tfDir *terraform.TfDir)
+	Save(moduleDir *ModuleDir, tfDir *TfDir)
 	ListTfDirs(moduleDirs []*dir.Dir) []string
 	ListModuleDirs(stateDirs []*dir.Dir) []string
 	Dump()
 }
 
 type InMemoryStore struct {
-	*terraform.DependencyGraph
-	*terraform.DependentGraph
+	*DependencyGraph
+	*DependentGraph
 }
 
 func NewInMemoryStore() *InMemoryStore {
 	return &InMemoryStore{
-		DependencyGraph: terraform.NewDependencyGraph(),
-		DependentGraph:  terraform.NewDependentGraph(),
+		DependencyGraph: NewDependencyGraph(),
+		DependentGraph:  NewDependentGraph(),
 	}
 }
 
-func (s *InMemoryStore) Save(moduleDir *terraform.ModuleDir, tfDir *terraform.TfDir) {
+func (s *InMemoryStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
 	s.DependencyGraph.Add(tfDir, moduleDir)
 	s.DependentGraph.Add(moduleDir, tfDir)
 }
@@ -36,7 +35,7 @@ func (s *InMemoryStore) ListTfDirs(moduleDirs []*dir.Dir) []string {
 	result := collection.NewTreeSet()
 
 	for _, moduleDir := range moduleDirs {
-		src := terraform.NewModuleDir(moduleDir.Rel(), moduleDir.BaseDir())
+		src := NewModuleDir(moduleDir.Rel(), moduleDir.BaseDir())
 		tfDirs := s.DependentGraph.ListDst(src)
 		for _, tfDir := range tfDirs {
 			if !s.DependentGraph.IsModule(tfDir) {
@@ -52,7 +51,7 @@ func (s *InMemoryStore) ListModuleDirs(stateDirs []*dir.Dir) []string {
 	result := collection.NewTreeSet()
 
 	for _, stateDir := range stateDirs {
-		src := terraform.NewTfDir(stateDir.Rel(), stateDir.BaseDir())
+		src := NewTfDir(stateDir.Rel(), stateDir.BaseDir())
 		moduleDirs := s.DependencyGraph.ListDst(src)
 		for _, moduleDir := range moduleDirs {
 			result.Add(moduleDir.Rel())

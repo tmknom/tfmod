@@ -10,11 +10,11 @@ import (
 
 type DependenciesRunner struct {
 	flags *DependenciesFlags
-	Store
+	terraform.Store
 	*IO
 }
 
-func NewDependenciesRunner(flags *DependenciesFlags, store Store, io *IO) *DependenciesRunner {
+func NewDependenciesRunner(flags *DependenciesFlags, store terraform.Store, io *IO) *DependenciesRunner {
 	return &DependenciesRunner{
 		flags: flags,
 		Store: store,

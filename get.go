@@ -10,11 +10,11 @@ import (
 
 type GetRunner struct {
 	flags *GetFlags
-	Store
+	terraform.Store
 	*IO
 }
 
-func NewGetRunner(flags *GetFlags, store Store, io *IO) *GetRunner {
+func NewGetRunner(flags *GetFlags, store terraform.Store, io *IO) *GetRunner {
 	return &GetRunner{
 		flags: flags,
 		Store: store,

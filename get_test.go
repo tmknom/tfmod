@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/tmknom/tfmod/internal/testlib"
-
 	"github.com/google/go-cmp/cmp"
+	"github.com/tmknom/tfmod/internal/terraform"
+	"github.com/tmknom/tfmod/internal/testlib"
 )
 
 func TestGetRunner_List(t *testing.T) {
@@ -29,7 +29,7 @@ func TestGetRunner_List(t *testing.T) {
 				Debug:   true,
 			},
 		}
-		sut := NewGetRunner(flags, NewInMemoryStore(), bufIO)
+		sut := NewGetRunner(flags, terraform.NewInMemoryStore(), bufIO)
 
 		actual, err := sut.TerraformGet()
 		if err != nil {

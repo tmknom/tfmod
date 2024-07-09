@@ -1,11 +1,10 @@
-package tfmod
+package terraform
 
 import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/tmknom/tfmod/internal/dir"
-	"github.com/tmknom/tfmod/internal/terraform"
 	"github.com/tmknom/tfmod/internal/testlib"
 )
 
@@ -26,10 +25,10 @@ func TestInMemoryStore_ListModuleDirs(t *testing.T) {
 
 	baseDir := dir.NewBaseDir("testdata/terraform")
 	sut := NewInMemoryStore()
-	sut.Save(terraform.NewModuleDir("module/foo", baseDir), terraform.NewTfDir("env/dev", baseDir))
-	sut.Save(terraform.NewModuleDir("module/foo", baseDir), terraform.NewTfDir("env/prd", baseDir))
-	sut.Save(terraform.NewModuleDir("module/bar", baseDir), terraform.NewTfDir("env/dev", baseDir))
-	sut.Save(terraform.NewModuleDir("module/baz", baseDir), terraform.NewTfDir("env/prd", baseDir))
+	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/dev", baseDir))
+	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/prd", baseDir))
+	sut.Save(NewModuleDir("module/bar", baseDir), NewTfDir("env/dev", baseDir))
+	sut.Save(NewModuleDir("module/baz", baseDir), NewTfDir("env/prd", baseDir))
 
 	for _, tc := range cases {
 		actual := sut.ListModuleDirs(baseDir.ConvertDirs(tc.input))
@@ -57,11 +56,11 @@ func TestInMemoryStore_ListTfDirs(t *testing.T) {
 
 	baseDir := dir.NewBaseDir("testdata/terraform")
 	sut := NewInMemoryStore()
-	sut.Save(terraform.NewModuleDir("module/foo", baseDir), terraform.NewTfDir("env/dev", baseDir))
-	sut.Save(terraform.NewModuleDir("module/foo", baseDir), terraform.NewTfDir("env/prd", baseDir))
-	sut.Save(terraform.NewModuleDir("module/foo", baseDir), terraform.NewTfDir("env/stg", baseDir))
-	sut.Save(terraform.NewModuleDir("module/bar", baseDir), terraform.NewTfDir("env/dev", baseDir))
-	sut.Save(terraform.NewModuleDir("module/baz", baseDir), terraform.NewTfDir("env/prd", baseDir))
+	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/dev", baseDir))
+	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/prd", baseDir))
+	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/stg", baseDir))
+	sut.Save(NewModuleDir("module/bar", baseDir), NewTfDir("env/dev", baseDir))
+	sut.Save(NewModuleDir("module/baz", baseDir), NewTfDir("env/prd", baseDir))
 
 	for _, tc := range cases {
 		actual := sut.ListTfDirs(baseDir.ConvertDirs(tc.input))

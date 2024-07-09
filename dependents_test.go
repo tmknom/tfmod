@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/tmknom/tfmod/internal/testlib"
-
 	"github.com/google/go-cmp/cmp"
+	"github.com/tmknom/tfmod/internal/terraform"
+	"github.com/tmknom/tfmod/internal/testlib"
 )
 
 func TestDependentsRunner_List(t *testing.T) {
@@ -48,7 +48,7 @@ func TestDependentsRunner_List(t *testing.T) {
 			ModuleDirs:  tc.input,
 			GlobalFlags: globalFlags,
 		}
-		sut := NewDependentsRunner(flags, NewInMemoryStore(), bufIO)
+		sut := NewDependentsRunner(flags, terraform.NewInMemoryStore(), bufIO)
 
 		actual, err := sut.List()
 		if err != nil {
