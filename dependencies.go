@@ -62,7 +62,7 @@ func (r *DependenciesRunner) List() ([]string, error) {
 	}
 
 	r.Store.Dump()
-	result := r.Store.ListModuleDirs(baseDir.ConvertDirs(r.flags.StateDirs))
+	result := r.Store.List(baseDir.ConvertDirs(r.flags.StateDirs))
 	log.Printf("Result: %#v", result)
 
 	return result, nil

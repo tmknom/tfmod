@@ -48,7 +48,7 @@ func TestDependentsRunner_List(t *testing.T) {
 			ModuleDirs:  tc.input,
 			GlobalFlags: globalFlags,
 		}
-		sut := NewDependentsRunner(flags, terraform.NewInMemoryStore(), bufIO)
+		sut := NewDependentsRunner(flags, terraform.NewDependentStore(), bufIO)
 
 		actual, err := sut.List()
 		if err != nil {

@@ -40,7 +40,7 @@ func TestDependenciesRunner_List(t *testing.T) {
 			StateDirs:   tc.input,
 			GlobalFlags: globalFlags,
 		}
-		sut := NewDependenciesRunner(flags, terraform.NewInMemoryStore(), bufIO)
+		sut := NewDependenciesRunner(flags, terraform.NewDependencyStore(), bufIO)
 
 		actual, err := sut.List()
 		if err != nil {

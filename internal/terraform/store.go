@@ -9,29 +9,57 @@ import (
 
 type Store interface {
 	Save(moduleDir *ModuleDir, tfDir *TfDir)
-	ListTfDirs(moduleDirs []*dir.Dir) []string
-	ListModuleDirs(stateDirs []*dir.Dir) []string
+	List(dirs []*dir.Dir) []string
 	Dump()
 }
 
-type InMemoryStore struct {
+type DependencyStore struct {
 	*DependencyGraph
-	*DependentGraph
 }
 
-func NewInMemoryStore() *InMemoryStore {
-	return &InMemoryStore{
+func NewDependencyStore() *DependencyStore {
+	return &DependencyStore{
 		DependencyGraph: NewDependencyGraph(),
-		DependentGraph:  NewDependentGraph(),
 	}
 }
 
-func (s *InMemoryStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
+func (s *DependencyStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
 	s.DependencyGraph.Add(tfDir, moduleDir)
+}
+
+func (s *DependencyStore) List(stateDirs []*dir.Dir) []string {
+	result := collection.NewTreeSet()
+
+	for _, stateDir := range stateDirs {
+		src := NewTfDir(stateDir.Rel(), stateDir.BaseDir())
+		moduleDirs := s.DependencyGraph.ListDst(src)
+		for _, moduleDir := range moduleDirs {
+			result.Add(moduleDir.Rel())
+		}
+	}
+
+	return result.Slice()
+}
+
+func (s *DependencyStore) Dump() {
+	log.Printf("DependencyGraph: %v", s.DependencyGraph)
+}
+
+type DependentStore struct {
+	*DependentGraph
+}
+
+func NewDependentStore() *DependentStore {
+	return &DependentStore{
+		DependentGraph: NewDependentGraph(),
+	}
+}
+
+func (s *DependentStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
 	s.DependentGraph.Add(moduleDir, tfDir)
 }
 
-func (s *InMemoryStore) ListTfDirs(moduleDirs []*dir.Dir) []string {
+func (s *DependentStore) List(moduleDirs []*dir.Dir) []string {
 	result := collection.NewTreeSet()
 
 	for _, moduleDir := range moduleDirs {
@@ -47,21 +75,6 @@ func (s *InMemoryStore) ListTfDirs(moduleDirs []*dir.Dir) []string {
 	return result.Slice()
 }
 
-func (s *InMemoryStore) ListModuleDirs(stateDirs []*dir.Dir) []string {
-	result := collection.NewTreeSet()
-
-	for _, stateDir := range stateDirs {
-		src := NewTfDir(stateDir.Rel(), stateDir.BaseDir())
-		moduleDirs := s.DependencyGraph.ListDst(src)
-		for _, moduleDir := range moduleDirs {
-			result.Add(moduleDir.Rel())
-		}
-	}
-
-	return result.Slice()
-}
-
-func (s *InMemoryStore) Dump() {
-	log.Printf("DependencyGraph: %v", s.DependencyGraph)
+func (s *DependentStore) Dump() {
 	log.Printf("DependentGraph: %v", s.DependentGraph)
 }

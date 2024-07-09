@@ -29,7 +29,7 @@ func TestGetRunner_List(t *testing.T) {
 				Debug:   true,
 			},
 		}
-		sut := NewGetRunner(flags, terraform.NewInMemoryStore(), bufIO)
+		sut := NewGetRunner(flags, terraform.NewDependentStore(), bufIO)
 
 		actual, err := sut.TerraformGet()
 		if err != nil {

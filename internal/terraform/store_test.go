@@ -8,7 +8,7 @@ import (
 	"github.com/tmknom/tfmod/internal/testlib"
 )
 
-func TestInMemoryStore_ListModuleDirs(t *testing.T) {
+func TestDependencyStore_List(t *testing.T) {
 	cases := []struct {
 		input    []string
 		expected []string
@@ -24,14 +24,14 @@ func TestInMemoryStore_ListModuleDirs(t *testing.T) {
 	}
 
 	baseDir := dir.NewBaseDir("testdata/terraform")
-	sut := NewInMemoryStore()
+	sut := NewDependencyStore()
 	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/dev", baseDir))
 	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/prd", baseDir))
 	sut.Save(NewModuleDir("module/bar", baseDir), NewTfDir("env/dev", baseDir))
 	sut.Save(NewModuleDir("module/baz", baseDir), NewTfDir("env/prd", baseDir))
 
 	for _, tc := range cases {
-		actual := sut.ListModuleDirs(baseDir.ConvertDirs(tc.input))
+		actual := sut.List(baseDir.ConvertDirs(tc.input))
 
 		if diff := cmp.Diff(tc.expected, actual); diff != "" {
 			t.Errorf(testlib.Format(sut, tc.expected, actual, tc.input))
@@ -39,7 +39,7 @@ func TestInMemoryStore_ListModuleDirs(t *testing.T) {
 	}
 }
 
-func TestInMemoryStore_ListTfDirs(t *testing.T) {
+func TestDependentStore_List(t *testing.T) {
 	cases := []struct {
 		input    []string
 		expected []string
@@ -55,7 +55,7 @@ func TestInMemoryStore_ListTfDirs(t *testing.T) {
 	}
 
 	baseDir := dir.NewBaseDir("testdata/terraform")
-	sut := NewInMemoryStore()
+	sut := NewDependentStore()
 	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/dev", baseDir))
 	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/prd", baseDir))
 	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/stg", baseDir))
@@ -63,7 +63,7 @@ func TestInMemoryStore_ListTfDirs(t *testing.T) {
 	sut.Save(NewModuleDir("module/baz", baseDir), NewTfDir("env/prd", baseDir))
 
 	for _, tc := range cases {
-		actual := sut.ListTfDirs(baseDir.ConvertDirs(tc.input))
+		actual := sut.List(baseDir.ConvertDirs(tc.input))
 
 		if diff := cmp.Diff(tc.expected, actual); diff != "" {
 			t.Errorf(testlib.Format(sut, tc.expected, actual, tc.input))

@@ -59,7 +59,7 @@ func (a *App) Run(args []string) error {
 
 func (a *App) newGetCommand() *cobra.Command {
 	flags := NewGetFlags(a.GlobalFlags)
-	runner := NewGetRunner(flags, terraform.NewInMemoryStore(), a.IO)
+	runner := NewGetRunner(flags, terraform.NewDependentStore(), a.IO)
 	command := &cobra.Command{
 		Use:   "get",
 		Short: "Run terraform get",
@@ -70,7 +70,7 @@ func (a *App) newGetCommand() *cobra.Command {
 
 func (a *App) newDependenciesCommand() *cobra.Command {
 	flags := NewDependenciesFlags(a.GlobalFlags)
-	runner := NewDependenciesRunner(flags, terraform.NewInMemoryStore(), a.IO)
+	runner := NewDependenciesRunner(flags, terraform.NewDependencyStore(), a.IO)
 	command := &cobra.Command{
 		Use:   "dependencies",
 		Short: "List module dependencies",
@@ -82,7 +82,7 @@ func (a *App) newDependenciesCommand() *cobra.Command {
 
 func (a *App) newDependentsCommand() *cobra.Command {
 	flags := NewDependentsFlags(a.GlobalFlags)
-	runner := NewDependentsRunner(flags, terraform.NewInMemoryStore(), a.IO)
+	runner := NewDependentsRunner(flags, terraform.NewDependentStore(), a.IO)
 	command := &cobra.Command{
 		Use:   "dependents",
 		Short: "List module dependents",
