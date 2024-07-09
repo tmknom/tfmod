@@ -3,6 +3,8 @@ package terraform
 import (
 	"testing"
 
+	"github.com/tmknom/tfmod/internal/testlib"
+
 	"github.com/tmknom/tfmod/internal/dir"
 )
 
@@ -12,10 +14,10 @@ func TestTerraform_GetAll(t *testing.T) {
 	}
 
 	cases := []struct {
-		inputs []string
+		input []string
 	}{
 		{
-			inputs: []string{"dev", "prd", "stg"},
+			input: []string{"dev", "prd", "stg"},
 		},
 	}
 
@@ -23,9 +25,9 @@ func TestTerraform_GetAll(t *testing.T) {
 	for _, tc := range cases {
 		sut := NewCommand()
 
-		err := sut.GetAll(baseDir.ConvertDirs(tc.inputs))
+		err := sut.GetAll(baseDir.ConvertDirs(tc.input))
 		if err != nil {
-			t.Fatalf("unexpected error:\n input: %v\n error: %+v", tc.inputs, err)
+			t.Errorf(testlib.FormatError(err, sut, tc.input))
 		}
 	}
 }
