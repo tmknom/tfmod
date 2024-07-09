@@ -35,9 +35,9 @@ install: deps ## install
 .PHONY: run
 run: build ## run command
 	bin/tfmod get --debug --base-dir "testdata/terraform/env"
-	echo
+	@echo
 	bin/tfmod dependencies --debug --base-dir "testdata/terraform" --state-dirs="env/dev"
-	echo
+	@echo
 	bin/tfmod dependents --debug --base-dir "testdata" --module-dirs="terraform/module/foo" --format=json
 
 .PHONY: test
