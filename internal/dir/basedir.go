@@ -13,15 +13,60 @@ import (
 )
 
 type BaseDir struct {
-	raw string
-	abs string
+	raw  string
+	abs  string
+	rel  string
+	work string
 }
 
 func NewBaseDir(raw string) *BaseDir {
 	return &BaseDir{
-		raw: raw,
-		abs: "",
+		raw:  raw,
+		abs:  "",
+		rel:  ".",
+		work: "",
 	}
+}
+
+func (d *BaseDir) Abs() string {
+	if d.abs == "" {
+		d.abs = d.generateAbs()
+	}
+	return d.abs
+}
+
+func (d *BaseDir) generateAbs() string {
+	if filepath.IsAbs(d.raw) {
+		return d.raw
+	}
+	return filepath.Clean(filepath.Join(d.Work(), d.raw))
+}
+
+func (d *BaseDir) Rel() string {
+	return d.rel
+}
+
+func (d *BaseDir) RelByWork() string {
+	result, err := filepath.Rel(d.Work(), d.Abs())
+	if err != nil {
+		log.Fatalf("%+v", errlib.Wrapf(err, "cannot resolve rel, work: %s, abs: %s", d.Work(), d.Abs()))
+	}
+	return filepath.Clean(result)
+}
+
+func (d *BaseDir) Work() string {
+	if d.work == "" {
+		d.work = d.generateWork()
+	}
+	return d.work
+}
+
+func (d *BaseDir) generateWork() string {
+	result, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("%+v", errlib.Wrapf(err, "cannot resolve work dir"))
+	}
+	return filepath.Clean(result)
 }
 
 func (d *BaseDir) CreateDir(raw string) *Dir {
@@ -34,32 +79,6 @@ func (d *BaseDir) ConvertDirs(dirs []string) []*Dir {
 		result = append(result, d.CreateDir(dir))
 	}
 	return result
-}
-
-func (d *BaseDir) Abs() string {
-	if d.abs != "" {
-		return d.abs
-	}
-	return d.generateAbs()
-}
-
-func (d *BaseDir) generateAbs() string {
-	dir := d.raw
-	if len(dir) > 0 && dir[0] != os.PathSeparator {
-		currentDir, err := os.Getwd()
-		if err != nil {
-			log.Fatalf("%+v", errlib.Wrapf(err, "invalid current dir: %s", dir))
-		}
-		dir = filepath.Join(currentDir, dir)
-	}
-
-	result, err := filepath.Abs(dir)
-	if err != nil {
-		log.Fatalf("%+v", errlib.Wrapf(err, "invalid base dir: %s", dir))
-	}
-
-	d.abs = result
-	return d.abs
 }
 
 func (d *BaseDir) FilterSubDirs(ext string, exclude string) ([]*Dir, error) {

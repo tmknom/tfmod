@@ -30,3 +30,7 @@ func (d *Graph[SRC, DST]) ListDst(src *SRC) []*DST {
 func (d *Graph[SRC, DST]) String() string {
 	return fmt.Sprintf("%v", d.items)
 }
+
+func (d *Graph[SRC, DST]) GoString() string {
+	return d.String()
+}

@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/tmknom/tfmod/internal/testlib"
+
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -12,28 +14,32 @@ func TestBaseDir_Abs(t *testing.T) {
 	currentDir, _ := os.Getwd()
 
 	cases := []struct {
-		raw      string
+		input    string
 		expected string
 	}{
 		{
-			raw:      ".",
+			input:    ".",
 			expected: currentDir,
 		},
 		{
-			raw:      "testdata/terraform/../",
+			input:    "testdata/terraform/../",
 			expected: fmt.Sprintf("%s/%s", currentDir, "testdata"),
 		},
 		{
-			raw:      "/path/to/dir",
+			input:    "/path/to/dir",
 			expected: "/path/to/dir",
+		},
+		{
+			input:    "../../internal/dir/foo/bar/baz/../",
+			expected: fmt.Sprintf("%s/%s", currentDir, "foo/bar"),
 		},
 	}
 
 	for _, tc := range cases {
-		sut := NewBaseDir(tc.raw)
+		sut := NewBaseDir(tc.input)
 		actual := sut.Abs()
 		if actual != tc.expected {
-			t.Errorf("expected: %v, actual: %v", tc.expected, actual)
+			t.Errorf(testlib.Format(sut, tc.expected, actual, tc.input))
 		}
 	}
 }
@@ -49,6 +55,6 @@ func TestBaseDir_FilterSubDirs(t *testing.T) {
 
 	expected := []string{"dev", "prd", "stg"}
 	if diff := cmp.Diff(expected, Dirs(actual).Slice()); diff != "" {
-		t.Errorf("expected: %v, actual: %v", expected, actual)
+		t.Errorf(testlib.FormatWithoutInput(sut, expected, actual))
 	}
 }
