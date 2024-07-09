@@ -62,7 +62,12 @@ func (r *DependenciesRunner) List() ([]string, error) {
 	}
 
 	r.Store.Dump()
-	result := r.Store.List(baseDir.ConvertDirs(r.flags.StateDirs))
+
+	stateDirs, err := baseDir.ConvertDirs(r.flags.StateDirs)
+	if err != nil {
+		return nil, err
+	}
+	result := r.Store.List(stateDirs)
 	log.Printf("Result: %#v", result)
 
 	return result, nil

@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/tmknom/tfmod/internal/testlib"
-
 	"github.com/tmknom/tfmod/internal/dir"
+	"github.com/tmknom/tfmod/internal/testlib"
 )
 
 func TestTerraform_GetAll(t *testing.T) {
@@ -26,7 +25,7 @@ func TestTerraform_GetAll(t *testing.T) {
 	for _, tc := range cases {
 		sut := NewCommand()
 
-		err := sut.GetAll(context.Background(), baseDir.ConvertDirs(tc.input))
+		err := sut.GetAll(context.Background(), FactoryTestDirs(tc.input, baseDir))
 		if err != nil {
 			t.Errorf(testlib.FormatError(err, sut, tc.input))
 		}

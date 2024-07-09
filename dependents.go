@@ -62,8 +62,13 @@ func (r *DependentsRunner) List() ([]string, error) {
 	}
 
 	r.Store.Dump()
-	result := r.Store.List(baseDir.ConvertDirs(r.flags.ModuleDirs))
-	log.Printf("Write stdout from: %#v", result)
+
+	moduleDirs, err := baseDir.ConvertDirs(r.flags.ModuleDirs)
+	if err != nil {
+		return nil, err
+	}
+	result := r.Store.List(moduleDirs)
+	log.Printf("Result: %#v", result)
 
 	return result, nil
 }
