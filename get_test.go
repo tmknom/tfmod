@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/tmknom/tfmod/internal/testlib"
+
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -27,15 +29,15 @@ func TestGetRunner_List(t *testing.T) {
 				Debug:   true,
 			},
 		}
-		runner := NewGetRunner(flags, NewInMemoryStore(), bufIO)
+		sut := NewGetRunner(flags, NewInMemoryStore(), bufIO)
 
-		actual, err := runner.TerraformGet()
+		actual, err := sut.TerraformGet()
 		if err != nil {
-			t.Fatalf("unexpected error:\n input: %v\n error: %+v", tc.input, err)
+			t.Fatalf(testlib.FormatError(err, sut, tc.input))
 		}
 
 		if diff := cmp.Diff(tc.expected, actual); diff != "" {
-			t.Errorf("input: %#v, expected: %v, actual: %v", flags.GlobalFlags, tc.expected, actual)
+			t.Errorf(testlib.Format(sut, tc.expected, actual, tc.input))
 		}
 	}
 }
