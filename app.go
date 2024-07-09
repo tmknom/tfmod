@@ -59,7 +59,7 @@ func (a *App) Run(args []string) error {
 
 func (a *App) newGetCommand() *cobra.Command {
 	flags := NewGetFlags(a.GlobalFlags)
-	runner := NewGetRunner(flags, terraform.NewDependentStore(), a.IO)
+	runner := NewGetRunner(flags, a.IO)
 	command := &cobra.Command{
 		Use:   "get",
 		Short: "Run terraform get",
