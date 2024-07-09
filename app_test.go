@@ -3,8 +3,9 @@ package tfmod
 import (
 	"bytes"
 	"os"
-	"strings"
 	"testing"
+
+	"github.com/tmknom/tfmod/internal/testlib"
 )
 
 func TestApp_Run_Dependencies(t *testing.T) {
@@ -13,26 +14,26 @@ func TestApp_Run_Dependencies(t *testing.T) {
 	}
 
 	cases := []struct {
-		inputs   []string
+		input    []string
 		expected string
 	}{
 		{
-			inputs:   []string{"dependencies", "--state-dirs", "env/prd", "--base-dir=testdata/terraform", "--format=json"},
+			input:    []string{"dependencies", "--state-dirs", "env/prd", "--base-dir=testdata/terraform", "--format=json"},
 			expected: "[\"module/bar\",\"module/baz\",\"module/foo\"]\n",
 		},
 	}
 
 	for _, tc := range cases {
-		app := NewApp(&IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}, &Ldflags{})
-		err := app.Run(tc.inputs)
+		sut := NewApp(&IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}, &Ldflags{})
+		err := sut.Run(tc.input)
 
 		if err != nil {
-			t.Fatalf("unexpected error:\n input: %v\n error: %+v", tc.inputs, err)
+			t.Fatalf(testlib.FormatError(err, sut, tc.input))
 		}
 
-		actual := app.IO.OutWriter.(*bytes.Buffer).String()
+		actual := sut.IO.OutWriter.(*bytes.Buffer).String()
 		if actual != tc.expected {
-			t.Errorf("%s\n expected: %s actual: %s", strings.Join(tc.inputs, " "), tc.expected, actual)
+			t.Errorf(testlib.Format(sut, tc.expected, actual, tc.input))
 		}
 	}
 }
@@ -43,26 +44,26 @@ func TestApp_Run_Dependents(t *testing.T) {
 	}
 
 	cases := []struct {
-		inputs   []string
+		input    []string
 		expected string
 	}{
 		{
-			inputs:   []string{"dependents", "--module-dirs", "module/foo", "--base-dir=testdata/terraform", "--format=text"},
+			input:    []string{"dependents", "--module-dirs", "module/foo", "--base-dir=testdata/terraform", "--format=text"},
 			expected: "env/dev env/prd env/stg\n",
 		},
 	}
 
 	for _, tc := range cases {
-		app := NewApp(&IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}, &Ldflags{})
-		err := app.Run(tc.inputs)
+		sut := NewApp(&IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}, &Ldflags{})
+		err := sut.Run(tc.input)
 
 		if err != nil {
-			t.Fatalf("unexpected error:\n input: %v\n error: %+v", tc.inputs, err)
+			t.Fatalf(testlib.FormatError(err, sut, tc.input))
 		}
 
-		actual := app.IO.OutWriter.(*bytes.Buffer).String()
+		actual := sut.IO.OutWriter.(*bytes.Buffer).String()
 		if actual != tc.expected {
-			t.Errorf("%s\n expected: %s actual: %s", strings.Join(tc.inputs, " "), tc.expected, actual)
+			t.Errorf(testlib.Format(sut, tc.expected, actual, tc.input))
 		}
 	}
 }

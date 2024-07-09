@@ -3,6 +3,8 @@ package terraform
 import (
 	"testing"
 
+	"github.com/tmknom/tfmod/internal/testlib"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/tmknom/tfmod/internal/dir"
 )
@@ -28,11 +30,11 @@ func TestFilter_SubDirs(t *testing.T) {
 
 		actual, err := sut.SubDirs()
 		if err != nil {
-			t.Errorf("unexpected error:\n input: %v\n error: %+v", tc.input, err)
+			t.Errorf(testlib.FormatError(err, sut, tc.input))
 		}
 
 		if diff := cmp.Diff(tc.expected, dir.Dirs(actual).Slice()); diff != "" {
-			t.Errorf("expected: %v, actual: %v", tc.expected, actual)
+			t.Errorf(testlib.Format(sut, tc.expected, actual, tc.input))
 		}
 	}
 }
