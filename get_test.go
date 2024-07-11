@@ -2,6 +2,7 @@ package tfmod
 
 import (
 	"bytes"
+	"context"
 	"os"
 	"testing"
 
@@ -30,7 +31,7 @@ func TestGetRunner_List(t *testing.T) {
 		}
 		sut := NewGetRunner(flags, bufIO)
 
-		actual, err := sut.TerraformGet()
+		actual, err := sut.TerraformGet(context.Background())
 		if err != nil {
 			t.Fatalf(testlib.FormatError(err, sut, tc.input))
 		}

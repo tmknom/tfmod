@@ -1,6 +1,7 @@
 package tfmod
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -45,6 +46,7 @@ func NewApp(io *IO, ldflags *Ldflags) *App {
 
 func (a *App) Run(args []string) error {
 	a.prepareCommand(args)
+	a.rootCmd.SetContext(context.Background())
 
 	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.BaseDir, "base-dir", "b", ".", "base directory")
 	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.Format, "format", "f", format.TextFormat, fmt.Sprintf("output format: %s", format.SupportType()))
@@ -63,7 +65,7 @@ func (a *App) newGetCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "get",
 		Short: "Run terraform get",
-		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
+		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run(cmd.Context()) },
 	}
 	return command
 }

@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	maxConcurrentJobs = 10
+	maxConcurrentJobs = 8
 	tfExt             = ".tf"
 	RootModuleDir     = "."
 	ModulesDir        = ".terraform" + string(os.PathSeparator) + "modules"

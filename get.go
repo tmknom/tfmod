@@ -1,6 +1,7 @@
 package tfmod
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -34,17 +35,16 @@ func (f *GetFlags) GoString() string {
 	return fmt.Sprintf("%#v", *f)
 }
 
-func (r *GetRunner) Run() error {
-	list, err := r.TerraformGet()
+func (r *GetRunner) Run(ctx context.Context) error {
+	list, err := r.TerraformGet(ctx)
 	if err != nil {
 		return err
 	}
 	return format.NewSliceFormatter(r.flags.Format, list, r.IO.OutWriter).Print()
 }
 
-func (r *GetRunner) TerraformGet() ([]string, error) {
+func (r *GetRunner) TerraformGet(ctx context.Context) ([]string, error) {
 	log.Printf("Runner flags: %#v", r.flags)
-
 	baseDir := r.flags.GetBaseDir()
 	filter := terraform.NewFilter(baseDir)
 	sourceDirs, err := filter.SubDirs()
@@ -53,7 +53,7 @@ func (r *GetRunner) TerraformGet() ([]string, error) {
 	}
 
 	terraformCommand := terraform.NewCommand()
-	err = terraformCommand.GetAll(sourceDirs)
+	err = terraformCommand.GetAll(ctx, sourceDirs)
 	if err != nil {
 		return nil, err
 	}

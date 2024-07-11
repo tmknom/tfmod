@@ -2,6 +2,8 @@ package terraform
 
 import (
 	"bytes"
+	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os/exec"
@@ -17,37 +19,49 @@ func NewCommand() *Command {
 	return &Command{}
 }
 
-func (c *Command) GetAll(workDirs []*dir.Dir) error {
-	jobs := make(chan string, len(workDirs))
+type token struct{}
+
+func (c *Command) GetAll(ctx context.Context, workDirs []*dir.Dir) error {
 	var wg sync.WaitGroup
+	wg.Add(len(workDirs))
 
-	for i := 0; i < maxConcurrentJobs; i++ {
-		wg.Add(1)
-		go c.worker(jobs, &wg)
+	sem := make(chan token, maxConcurrentJobs)
+	resultCh := make(chan string, len(workDirs))
+	errCh := make(chan error, len(workDirs))
+	for _, arg := range workDirs {
+		sem <- token{}
+		go func(arg string) {
+			defer func() {
+				<-sem
+				wg.Done()
+			}()
+			err := c.executeGet(ctx, arg)
+			if err != nil {
+				errCh <- err
+			}
+		}(arg.Abs())
 	}
 
-	for _, workDir := range workDirs {
-		jobs <- workDir.Abs()
+	go func() {
+		wg.Wait()
+		close(errCh)
+		close(resultCh)
+		close(sem)
+	}()
+
+	for result := range resultCh {
+		log.Println(result)
 	}
-	close(jobs)
 
-	wg.Wait()
-
-	return nil
+	var errs []error
+	for err := range errCh {
+		errs = append(errs, err)
+	}
+	return errors.Join(errs...)
 }
 
-func (c *Command) worker(jobs <-chan string, wg *sync.WaitGroup) {
-	defer wg.Done()
-	for workDir := range jobs {
-		err := c.executeGet(workDir)
-		if err != nil {
-			log.Printf("Error terraform get in %s: %v\n", workDir, err)
-		}
-	}
-}
-
-func (c *Command) executeGet(workDir string) error {
-	cmd := exec.Command("terraform", "get")
+func (c *Command) executeGet(ctx context.Context, workDir string) error {
+	cmd := exec.CommandContext(ctx, "terraform", "get")
 	cmd.Dir = workDir
 	cmd.Stdout = &bytes.Buffer{}
 	cmd.Stderr = &bytes.Buffer{}
@@ -57,7 +71,8 @@ func (c *Command) executeGet(workDir string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		return errlib.Wrapf(err, "%s\n stdout: %v\n stderr: %v\n", info, cmd.Stdout, cmd.Stderr)
+		exitCode := cmd.ProcessState.ExitCode()
+		return errlib.Wrapf(err, "%s\nStderr:\n%v\nStdout:\n%v\nWorkdir: %v\nExitcode: %d\n", cmd.String(), cmd.Stderr.(*bytes.Buffer).String(), cmd.Stdout.(*bytes.Buffer).String(), cmd.Dir, exitCode)
 	}
 	return nil
 }
