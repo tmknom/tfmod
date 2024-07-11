@@ -1,6 +1,7 @@
 package terraform
 
 import (
+	"context"
 	"testing"
 
 	"github.com/tmknom/tfmod/internal/testlib"
@@ -21,11 +22,11 @@ func TestTerraform_GetAll(t *testing.T) {
 		},
 	}
 
-	baseDir := dir.NewBaseDir("testdata/terraform/env")
+	baseDir := dir.NewBaseDir("../../testdata/terraform/env")
 	for _, tc := range cases {
 		sut := NewCommand()
 
-		err := sut.GetAll(baseDir.ConvertDirs(tc.input))
+		err := sut.GetAll(context.Background(), baseDir.ConvertDirs(tc.input))
 		if err != nil {
 			t.Errorf(testlib.FormatError(err, sut, tc.input))
 		}
