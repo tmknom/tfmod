@@ -36,9 +36,11 @@ func (c *Command) GetAll(ctx context.Context, workDirs []*dir.Dir) error {
 				<-sem
 				wg.Done()
 			}()
-			err := c.executeGet(ctx, arg)
+			info, err := c.executeGet(ctx, arg)
 			if err != nil {
 				errCh <- err
+			} else {
+				resultCh <- info
 			}
 		}(arg.Abs())
 	}
@@ -61,14 +63,11 @@ func (c *Command) GetAll(ctx context.Context, workDirs []*dir.Dir) error {
 	return errors.Join(errs...)
 }
 
-func (c *Command) executeGet(ctx context.Context, workDir string) error {
+func (c *Command) executeGet(ctx context.Context, workDir string) (string, error) {
 	cmd := exec.CommandContext(ctx, "terraform", "get")
 	cmd.Dir = workDir
 	cmd.Stdout = &bytes.Buffer{}
 	cmd.Stderr = &bytes.Buffer{}
-
-	info := fmt.Sprintf("%s (at %s)\n", cmd.String(), cmd.Dir)
-	log.Printf(fmt.Sprintf("execute: %s", info))
 
 	err := cmd.Run()
 	if err != nil {
@@ -77,7 +76,7 @@ func (c *Command) executeGet(ctx context.Context, workDir string) error {
 		b.WriteString(fmt.Sprintf("Stderr\n%s\n", cmd.Stderr.(*bytes.Buffer).String()))
 		b.WriteString(fmt.Sprintf("Stdout\n%s\n", cmd.Stdout.(*bytes.Buffer).String()))
 		b.WriteString(fmt.Sprintf("Workdir: %v\n", cmd.Dir))
-		return errlib.Wrapf(err, "%s", b.String())
+		return "", errlib.Wrapf(err, "%s", b.String())
 	}
-	return nil
+	return fmt.Sprintf("execute: %s (at %s)", cmd.String(), cmd.Dir), nil
 }
