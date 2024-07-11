@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"strings"
 	"sync"
 
 	"github.com/tmknom/tfmod/internal/dir"
@@ -71,8 +72,12 @@ func (c *Command) executeGet(ctx context.Context, workDir string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		exitCode := cmd.ProcessState.ExitCode()
-		return errlib.Wrapf(err, "%s\nStderr:\n%v\nStdout:\n%v\nWorkdir: %v\nExitcode: %d\n", cmd.String(), cmd.Stderr.(*bytes.Buffer).String(), cmd.Stdout.(*bytes.Buffer).String(), cmd.Dir, exitCode)
+		var b strings.Builder
+		b.WriteString(fmt.Sprintf("%s\n", cmd.String()))
+		b.WriteString(fmt.Sprintf("Stderr\n%s\n", cmd.Stderr.(*bytes.Buffer).String()))
+		b.WriteString(fmt.Sprintf("Stdout\n%s\n", cmd.Stdout.(*bytes.Buffer).String()))
+		b.WriteString(fmt.Sprintf("Workdir: %v\n", cmd.Dir))
+		return errlib.Wrapf(err, "%s", b.String())
 	}
 	return nil
 }
