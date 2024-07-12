@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/tmknom/tfmod/internal/dir"
@@ -106,22 +105,20 @@ func (a *App) prepareCommand(args []string) {
 	a.rootCmd.SetErr(a.IO.ErrWriter)
 
 	// setup log
-	cobra.OnInitialize(func() { a.setupLog(a.rootCmd.Name(), args) })
+	cobra.OnInitialize(func() { a.setupLog(args) })
 
 	// setup version option
 	version := fmt.Sprintf("%s version %s (%s)", a.Ldflags.Name, a.Ldflags.Version, a.Ldflags.Date)
 	a.rootCmd.SetVersionTemplate(version)
 }
 
-func (a *App) setupLog(name string, args []string) {
+func (a *App) setupLog(args []string) {
 	log.SetOutput(io.Discard)
 	if a.GlobalFlags.Debug {
-		log.SetOutput(os.Stderr)
+		log.SetOutput(a.IO.OutWriter)
 	}
 	log.SetPrefix(fmt.Sprintf("[%s] ", a.Ldflags.Name))
-	log.Printf("Start: %s", name)
-	log.Printf("Args: %q", args)
-	log.Printf("Ldflags: %+v", a.Ldflags)
+	log.Printf("Start: args: %v, ldflags: %+v", args, a.Ldflags)
 }
 
 type GlobalFlags struct {
@@ -135,5 +132,5 @@ func (f *GlobalFlags) GetBaseDir() *dir.BaseDir {
 }
 
 func (f *GlobalFlags) GoString() string {
-	return fmt.Sprintf("%#v", *f)
+	return fmt.Sprintf("{BaseDir: '%s', Format: %s, Debug: %t}", f.BaseDir, f.Format, f.Debug)
 }
