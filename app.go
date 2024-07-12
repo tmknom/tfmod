@@ -48,7 +48,7 @@ func (a *App) Run(args []string) error {
 	a.rootCmd.SetContext(context.Background())
 
 	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.base, "base", "b", ".", "The base directory that contains tf files")
-	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.format, "format", "f", format.TextFormat, fmt.Sprintf("output format: %s", format.SupportType()))
+	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.format, "format", "f", format.TextFormat, fmt.Sprintf("Format output by: {%s}", format.SupportType()))
 	a.rootCmd.PersistentFlags().BoolVar(&a.GlobalFlags.debug, "debug", false, "show debugging output")
 
 	a.rootCmd.AddCommand(a.newGetCommand())
