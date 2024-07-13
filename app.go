@@ -23,6 +23,7 @@ type Ldflags struct {
 	Version string
 	Commit  string
 	Date    string
+	Url     string
 }
 
 type App struct {
@@ -108,7 +109,7 @@ func (a *App) prepareCommand(args []string) {
 	cobra.OnInitialize(func() { a.setupLog(args) })
 
 	// setup version option
-	version := fmt.Sprintf("%s version %s (%s)", a.Ldflags.Name, a.Ldflags.Version, a.Ldflags.Date)
+	version := fmt.Sprintf("%s version %s (%s)\n%s\n", a.Ldflags.Name, a.Ldflags.Version, a.Ldflags.Date, a.Ldflags.Url)
 	a.rootCmd.SetVersionTemplate(version)
 }
 

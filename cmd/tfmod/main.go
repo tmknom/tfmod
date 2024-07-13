@@ -14,6 +14,7 @@ var (
 	version = ""
 	commit  = ""
 	date    = ""
+	url     = ""
 )
 
 func main() {
@@ -35,6 +36,7 @@ func createApp() *tfmod.App {
 		Version: version,
 		Commit:  commit,
 		Date:    date,
+		Url:     url,
 	}
 
 	return tfmod.NewApp(io, ldflags)
