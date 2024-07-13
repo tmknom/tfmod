@@ -15,5 +15,5 @@ func NewFilter(baseDir *dir.BaseDir) *Filter {
 }
 
 func (t *Filter) SubDirs() ([]*dir.Dir, error) {
-	return t.baseDir.FilterSubDirs(tfExt, ModulesDir)
+	return t.baseDir.ListSubDirs(tfExt, ModulesDir)
 }

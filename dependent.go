@@ -8,36 +8,36 @@ import (
 	"github.com/tmknom/tfmod/internal/terraform"
 )
 
-type DependentsRunner struct {
-	flags *DependentsFlags
+type DependentRunner struct {
+	flags *DependentFlags
 	terraform.Store
 	*IO
 }
 
-func NewDependentsRunner(flags *DependentsFlags, store terraform.Store, io *IO) *DependentsRunner {
-	return &DependentsRunner{
+func NewDependentRunner(flags *DependentFlags, store terraform.Store, io *IO) *DependentRunner {
+	return &DependentRunner{
 		flags: flags,
 		Store: store,
 		IO:    io,
 	}
 }
 
-type DependentsFlags struct {
-	ModuleDirs []string
+type DependentFlags struct {
+	ModulePaths []string
 	*GlobalFlags
 }
 
-func NewDependentsFlags(globalFlags *GlobalFlags) *DependentsFlags {
-	return &DependentsFlags{
+func NewDependentFlags(globalFlags *GlobalFlags) *DependentFlags {
+	return &DependentFlags{
 		GlobalFlags: globalFlags,
 	}
 }
 
-func (f *DependentsFlags) GoString() string {
+func (f *DependentFlags) GoString() string {
 	return fmt.Sprintf("%#v", *f)
 }
 
-func (r *DependentsRunner) Run() error {
+func (r *DependentRunner) Run() error {
 	list, err := r.List()
 	if err != nil {
 		return err
@@ -45,10 +45,10 @@ func (r *DependentsRunner) Run() error {
 	return format.NewSliceFormatter(r.flags.Format(), list, r.IO.OutWriter).Print()
 }
 
-func (r *DependentsRunner) List() ([]string, error) {
+func (r *DependentRunner) List() ([]string, error) {
 	log.Printf("Runner flags: %#v", r.flags)
 
-	baseDir := r.flags.GetBaseDir()
+	baseDir := r.flags.BaseDir()
 	filter := terraform.NewFilter(baseDir)
 	sourceDirs, err := filter.SubDirs()
 	if err != nil {
@@ -63,7 +63,7 @@ func (r *DependentsRunner) List() ([]string, error) {
 
 	r.Store.Dump()
 
-	moduleDirs, err := baseDir.ConvertDirs(r.flags.ModuleDirs)
+	moduleDirs, err := baseDir.FilterDirs(r.flags.ModulePaths)
 	if err != nil {
 		return nil, err
 	}

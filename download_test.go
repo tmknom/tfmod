@@ -23,12 +23,12 @@ func TestGetRunner_List(t *testing.T) {
 
 	for _, tc := range cases {
 		bufIO := &IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}
-		flags := &GetFlags{
+		flags := &DownloadFlags{
 			GlobalFlags: &GlobalFlags{
 				base: tc.input,
 			},
 		}
-		sut := NewGetRunner(flags, bufIO)
+		sut := NewDownloadRunner(flags, bufIO)
 
 		actual, err := sut.TerraformGet(context.Background())
 		if err != nil {

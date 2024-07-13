@@ -9,33 +9,33 @@ import (
 	"github.com/tmknom/tfmod/internal/terraform"
 )
 
-type GetRunner struct {
-	flags *GetFlags
+type DownloadRunner struct {
+	flags *DownloadFlags
 	*IO
 }
 
-func NewGetRunner(flags *GetFlags, io *IO) *GetRunner {
-	return &GetRunner{
+func NewDownloadRunner(flags *DownloadFlags, io *IO) *DownloadRunner {
+	return &DownloadRunner{
 		flags: flags,
 		IO:    io,
 	}
 }
 
-type GetFlags struct {
+type DownloadFlags struct {
 	*GlobalFlags
 }
 
-func NewGetFlags(globalFlags *GlobalFlags) *GetFlags {
-	return &GetFlags{
+func NewDownloadFlags(globalFlags *GlobalFlags) *DownloadFlags {
+	return &DownloadFlags{
 		GlobalFlags: globalFlags,
 	}
 }
 
-func (f *GetFlags) GoString() string {
+func (f *DownloadFlags) GoString() string {
 	return fmt.Sprintf("%#v", *f)
 }
 
-func (r *GetRunner) Run(ctx context.Context) error {
+func (r *DownloadRunner) Run(ctx context.Context) error {
 	list, err := r.TerraformGet(ctx)
 	if err != nil {
 		return err
@@ -43,9 +43,9 @@ func (r *GetRunner) Run(ctx context.Context) error {
 	return format.NewSliceFormatter(r.flags.Format(), list, r.IO.OutWriter).Print()
 }
 
-func (r *GetRunner) TerraformGet(ctx context.Context) ([]string, error) {
+func (r *DownloadRunner) TerraformGet(ctx context.Context) ([]string, error) {
 	log.Printf("Runner flags: %#v", r.flags)
-	baseDir := r.flags.GetBaseDir()
+	baseDir := r.flags.BaseDir()
 	filter := terraform.NewFilter(baseDir)
 	sourceDirs, err := filter.SubDirs()
 	if err != nil {

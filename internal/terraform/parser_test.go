@@ -50,8 +50,8 @@ type FakeParserStore struct {
 	list []string
 }
 
-func (s *FakeParserStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
-	pair := strings.Join([]string{moduleDir.Rel(), tfDir.Rel()}, ":")
+func (s *FakeParserStore) Save(moduleDir *ModuleDir, stateDir *StateDir) {
+	pair := strings.Join([]string{moduleDir.Rel(), stateDir.Rel()}, ":")
 	s.list = append(s.list, pair)
 }
 

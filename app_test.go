@@ -8,7 +8,7 @@ import (
 	"github.com/tmknom/tfmod/internal/testlib"
 )
 
-func TestApp_Run_Dependencies(t *testing.T) {
+func TestApp_Run_Dependency(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -38,7 +38,7 @@ func TestApp_Run_Dependencies(t *testing.T) {
 	}
 }
 
-func TestApp_Run_Dependents(t *testing.T) {
+func TestApp_Run_Dependent(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

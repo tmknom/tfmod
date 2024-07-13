@@ -73,7 +73,7 @@ func (d *BaseDir) CreateDir(raw string) *Dir {
 	return NewDir(raw, d)
 }
 
-func (d *BaseDir) ConvertDirs(paths []string) ([]*Dir, error) {
+func (d *BaseDir) FilterDirs(paths []string) ([]*Dir, error) {
 	items := collection.NewTreeSet()
 
 	for _, path := range paths {
@@ -96,7 +96,7 @@ func (d *BaseDir) ConvertDirs(paths []string) ([]*Dir, error) {
 	return result, nil
 }
 
-func (d *BaseDir) FilterSubDirs(ext string, exclude string) ([]*Dir, error) {
+func (d *BaseDir) ListSubDirs(ext string, exclude string) ([]*Dir, error) {
 	absDirs := collection.NewTreeSet()
 
 	err := filepath.WalkDir(d.Abs(), func(absFilepath string, entry fs.DirEntry, err error) error {
