@@ -77,7 +77,7 @@ func (a *App) newDependenciesCommand() *cobra.Command {
 		Short: "List module dependencies",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
 	}
-	command.PersistentFlags().StringSliceVarP(&flags.StateDirs, "state-dirs", "s", []string{}, "state dirs")
+	command.PersistentFlags().StringSliceVarP(&flags.StateDirs, "state", "s", []string{}, "Directory paths for the state to managed configuration")
 	return command
 }
 
