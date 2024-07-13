@@ -31,7 +31,7 @@ func TestDependencyStore_List(t *testing.T) {
 	sut.Save(NewModuleDir("module/baz", baseDir), NewTfDir("env/prd", baseDir))
 
 	for _, tc := range cases {
-		actual := sut.List(baseDir.ConvertDirs(tc.input))
+		actual := sut.List(FactoryTestDirs(tc.input, baseDir))
 
 		if diff := cmp.Diff(tc.expected, actual); diff != "" {
 			t.Errorf(testlib.Format(sut, tc.expected, actual, tc.input))
@@ -63,10 +63,18 @@ func TestDependentStore_List(t *testing.T) {
 	sut.Save(NewModuleDir("module/baz", baseDir), NewTfDir("env/prd", baseDir))
 
 	for _, tc := range cases {
-		actual := sut.List(baseDir.ConvertDirs(tc.input))
+		actual := sut.List(FactoryTestDirs(tc.input, baseDir))
 
 		if diff := cmp.Diff(tc.expected, actual); diff != "" {
 			t.Errorf(testlib.Format(sut, tc.expected, actual, tc.input))
 		}
 	}
+}
+
+func FactoryTestDirs(paths []string, baseDir *dir.BaseDir) []*dir.Dir {
+	result := make([]*dir.Dir, 0, len(paths))
+	for _, path := range paths {
+		result = append(result, baseDir.CreateDir(path))
+	}
+	return result
 }

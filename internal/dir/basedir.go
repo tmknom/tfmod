@@ -73,12 +73,27 @@ func (d *BaseDir) CreateDir(raw string) *Dir {
 	return NewDir(raw, d)
 }
 
-func (d *BaseDir) ConvertDirs(dirs []string) []*Dir {
-	result := make([]*Dir, 0, len(dirs))
-	for _, dir := range dirs {
-		result = append(result, d.CreateDir(dir))
+func (d *BaseDir) ConvertDirs(paths []string) ([]*Dir, error) {
+	items := collection.NewTreeSet()
+
+	for _, path := range paths {
+		abs := d.CreateDir(path).Abs()
+		stat, err := os.Stat(abs)
+		if err != nil {
+			return nil, err
+		}
+		if !stat.IsDir() {
+			abs = filepath.Dir(abs)
+		}
+		items.Add(abs)
 	}
-	return result
+
+	sliceItems := items.Slice()
+	result := make([]*Dir, 0, len(sliceItems))
+	for _, item := range sliceItems {
+		result = append(result, d.CreateDir(item))
+	}
+	return result, nil
 }
 
 func (d *BaseDir) FilterSubDirs(ext string, exclude string) ([]*Dir, error) {

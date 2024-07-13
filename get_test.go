@@ -26,7 +26,6 @@ func TestGetRunner_List(t *testing.T) {
 		flags := &GetFlags{
 			GlobalFlags: &GlobalFlags{
 				BaseDir: tc.input,
-				Debug:   true,
 			},
 		}
 		sut := NewGetRunner(flags, bufIO)

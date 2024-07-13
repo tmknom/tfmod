@@ -39,7 +39,6 @@ func TestDependentsRunner_List(t *testing.T) {
 
 	globalFlags := &GlobalFlags{
 		BaseDir: "testdata/terraform",
-		Debug:   true,
 	}
 
 	for _, tc := range cases {
