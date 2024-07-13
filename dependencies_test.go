@@ -30,7 +30,7 @@ func TestDependenciesRunner_List(t *testing.T) {
 	}
 
 	globalFlags := &GlobalFlags{
-		BaseDir: "testdata/terraform",
+		base: "testdata/terraform",
 	}
 
 	for _, tc := range cases {

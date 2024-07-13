@@ -47,9 +47,9 @@ func (a *App) Run(args []string) error {
 	a.prepareCommand(args)
 	a.rootCmd.SetContext(context.Background())
 
-	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.BaseDir, "base-dir", "b", ".", "base directory")
-	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.Format, "format", "f", format.TextFormat, fmt.Sprintf("output format: %s", format.SupportType()))
-	a.rootCmd.PersistentFlags().BoolVar(&a.GlobalFlags.Debug, "debug", false, "show debugging output")
+	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.base, "base", "b", ".", "The base directory that contains tf files")
+	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.format, "format", "f", format.TextFormat, fmt.Sprintf("Format output by: {%s}", format.SupportType()))
+	a.rootCmd.PersistentFlags().BoolVar(&a.GlobalFlags.debug, "debug", false, "Show debugging output")
 
 	a.rootCmd.AddCommand(a.newGetCommand())
 	a.rootCmd.AddCommand(a.newDependenciesCommand())
@@ -77,7 +77,7 @@ func (a *App) newDependenciesCommand() *cobra.Command {
 		Short: "List module dependencies",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
 	}
-	command.PersistentFlags().StringSliceVarP(&flags.StateDirs, "state-dirs", "s", []string{}, "state dirs")
+	command.PersistentFlags().StringSliceVarP(&flags.StateDirs, "state", "s", []string{}, "Directory paths for the state to managed configuration")
 	return command
 }
 
@@ -89,7 +89,7 @@ func (a *App) newDependentsCommand() *cobra.Command {
 		Short: "List module dependents",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
 	}
-	command.PersistentFlags().StringSliceVarP(&flags.ModuleDirs, "module-dirs", "m", []string{}, "module dirs")
+	command.PersistentFlags().StringSliceVarP(&flags.ModuleDirs, "module", "m", []string{}, "File paths of the module sources")
 	return command
 }
 
@@ -114,7 +114,7 @@ func (a *App) prepareCommand(args []string) {
 
 func (a *App) setupLog(args []string) {
 	log.SetOutput(io.Discard)
-	if a.GlobalFlags.Debug {
+	if a.GlobalFlags.debug {
 		log.SetOutput(a.IO.OutWriter)
 	}
 	log.SetPrefix(fmt.Sprintf("[%s] ", a.Ldflags.Name))
@@ -122,15 +122,23 @@ func (a *App) setupLog(args []string) {
 }
 
 type GlobalFlags struct {
-	BaseDir string
-	Format  string
-	Debug   bool
+	base   string
+	format string
+	debug  bool
 }
 
 func (f *GlobalFlags) GetBaseDir() *dir.BaseDir {
-	return dir.NewBaseDir(f.BaseDir)
+	return dir.NewBaseDir(f.base)
+}
+
+func (f *GlobalFlags) Format() string {
+	return f.format
+}
+
+func (f *GlobalFlags) isDebug() bool {
+	return f.debug
 }
 
 func (f *GlobalFlags) GoString() string {
-	return fmt.Sprintf("{BaseDir: '%s', Format: %s, Debug: %t}", f.BaseDir, f.Format, f.Debug)
+	return fmt.Sprintf("{base: '%s', format: %s, debug: %t}", f.base, f.format, f.debug)
 }

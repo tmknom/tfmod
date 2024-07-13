@@ -42,7 +42,7 @@ func (r *DependenciesRunner) Run() error {
 	if err != nil {
 		return err
 	}
-	return format.NewSliceFormatter(r.flags.Format, list, r.IO.OutWriter).Print()
+	return format.NewSliceFormatter(r.flags.Format(), list, r.IO.OutWriter).Print()
 }
 
 func (r *DependenciesRunner) List() ([]string, error) {

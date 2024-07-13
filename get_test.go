@@ -25,7 +25,7 @@ func TestGetRunner_List(t *testing.T) {
 		bufIO := &IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}
 		flags := &GetFlags{
 			GlobalFlags: &GlobalFlags{
-				BaseDir: tc.input,
+				base: tc.input,
 			},
 		}
 		sut := NewGetRunner(flags, bufIO)
