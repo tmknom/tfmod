@@ -62,8 +62,8 @@ func (a *App) newGetCommand() *cobra.Command {
 	flags := NewGetFlags(a.GlobalFlags)
 	runner := NewGetRunner(flags, a.IO)
 	command := &cobra.Command{
-		Use:   "get",
-		Short: "Run terraform get",
+		Use:   "download",
+		Short: "Download all modules at once under the base directory",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run(cmd.Context()) },
 	}
 	return command
