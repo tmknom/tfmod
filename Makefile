@@ -4,12 +4,13 @@
 	@git clone https://github.com/tmknom/makefiles.git .makefiles >/dev/null 2>&1
 
 # Variables: Go
-VERSION ?= 0.0.1
-ROOT_DIR ?= $(shell \git rev-parse --show-toplevel)
 NAME = $(shell \basename $(ROOT_DIR))
+VERSION = $(shell \git tag --sort=-v:refname | head -1)
+OWNER = $(shell \gh config get -h github.com user)
 COMMIT = $(shell \git rev-parse HEAD)
 DATE = $(shell \date +"%Y-%m-%d")
-LDFLAGS ?= "-X main.name=$(NAME) -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.date=$(DATE)"
+URL = https://github.com/$(OWNER)/$(NAME)/releases/tag/$(VERSION)
+LDFLAGS ?= "-X main.name=$(NAME) -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.date=$(DATE) -X main.url=$(URL)"
 
 # Targets: Go
 .PHONY: all
@@ -26,11 +27,11 @@ deps:
 
 .PHONY: build
 build: deps ## build executable binary
-	go build -ldflags=$(LDFLAGS) -o bin/tfmod ./cmd/tfmod
+	go build -ldflags=$(LDFLAGS) -o bin/$(NAME) ./cmd/$(NAME)
 
 .PHONY: install
 install: deps ## install
-	go install -ldflags=$(LDFLAGS) ./cmd/tfmod
+	go install -ldflags=$(LDFLAGS) ./cmd/$(NAME)
 
 .PHONY: run
 run: build ## run command
