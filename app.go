@@ -73,8 +73,8 @@ func (a *App) newDependenciesCommand() *cobra.Command {
 	flags := NewDependenciesFlags(a.GlobalFlags)
 	runner := NewDependenciesRunner(flags, terraform.NewDependencyStore(), a.IO)
 	command := &cobra.Command{
-		Use:   "dependencies",
-		Short: "List module dependencies",
+		Use:   "dependency",
+		Short: "Explore the module directory it depends on",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
 	}
 	command.PersistentFlags().StringSliceVarP(&flags.StateDirs, "state", "s", []string{}, "Directory paths for the state to managed configuration")
