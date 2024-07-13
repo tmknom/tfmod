@@ -10,7 +10,7 @@ import (
 	"github.com/tmknom/tfmod/internal/testlib"
 )
 
-func TestDependentsRunner_List(t *testing.T) {
+func TestDependentRunner_List(t *testing.T) {
 	cases := []struct {
 		input    []string
 		expected []string
@@ -43,11 +43,11 @@ func TestDependentsRunner_List(t *testing.T) {
 
 	for _, tc := range cases {
 		bufIO := &IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}
-		flags := &DependentsFlags{
-			ModuleDirs:  tc.input,
+		flags := &DependentFlags{
+			ModulePaths: tc.input,
 			GlobalFlags: globalFlags,
 		}
-		sut := NewDependentsRunner(flags, terraform.NewDependentStore(), bufIO)
+		sut := NewDependentRunner(flags, terraform.NewDependentStore(), bufIO)
 
 		actual, err := sut.List()
 		if err != nil {

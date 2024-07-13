@@ -44,11 +44,10 @@ func TestBaseDir_Abs(t *testing.T) {
 	}
 }
 
-func TestBaseDir_FilterSubDirs(t *testing.T) {
-	rel := "../../testdata/terraform/env/"
-	sut := NewBaseDir(rel)
+func TestBaseDir_ListSubDirs(t *testing.T) {
+	sut := NewBaseDir("../../testdata/terraform/env/")
 
-	actual, err := sut.FilterSubDirs(".tf", ".terraform")
+	actual, err := sut.ListSubDirs(".tf", ".terraform")
 	if err != nil {
 		t.Fatalf("unexpected error: %+v", err)
 	}

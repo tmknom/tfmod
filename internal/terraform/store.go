@@ -8,7 +8,7 @@ import (
 )
 
 type Store interface {
-	Save(moduleDir *ModuleDir, tfDir *TfDir)
+	Save(moduleDir *ModuleDir, stateDir *StateDir)
 	List(dirs []*dir.Dir) []string
 	Dump()
 }
@@ -23,15 +23,15 @@ func NewDependencyStore() *DependencyStore {
 	}
 }
 
-func (s *DependencyStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
-	s.DependencyGraph.Add(tfDir, moduleDir)
+func (s *DependencyStore) Save(moduleDir *ModuleDir, stateDir *StateDir) {
+	s.DependencyGraph.Add(stateDir, moduleDir)
 }
 
 func (s *DependencyStore) List(stateDirs []*dir.Dir) []string {
 	result := collection.NewTreeSet()
 
 	for _, stateDir := range stateDirs {
-		src := NewTfDir(stateDir.Rel(), stateDir.BaseDir())
+		src := NewStateDir(stateDir.Rel(), stateDir.BaseDir())
 		moduleDirs := s.DependencyGraph.ListDst(src)
 		for _, moduleDir := range moduleDirs {
 			result.Add(moduleDir.Rel())
@@ -55,8 +55,8 @@ func NewDependentStore() *DependentStore {
 	}
 }
 
-func (s *DependentStore) Save(moduleDir *ModuleDir, tfDir *TfDir) {
-	s.DependentGraph.Add(moduleDir, tfDir)
+func (s *DependentStore) Save(moduleDir *ModuleDir, stateDir *StateDir) {
+	s.DependentGraph.Add(moduleDir, stateDir)
 }
 
 func (s *DependentStore) List(moduleDirs []*dir.Dir) []string {
@@ -64,10 +64,10 @@ func (s *DependentStore) List(moduleDirs []*dir.Dir) []string {
 
 	for _, moduleDir := range moduleDirs {
 		src := NewModuleDir(moduleDir.Rel(), moduleDir.BaseDir())
-		tfDirs := s.DependentGraph.ListDst(src)
-		for _, tfDir := range tfDirs {
-			if !s.DependentGraph.IsModule(tfDir) {
-				result.Add(tfDir.Rel())
+		stateDirs := s.DependentGraph.ListDst(src)
+		for _, stateDir := range stateDirs {
+			if !s.DependentGraph.IsModule(stateDir) {
+				result.Add(stateDir.Rel())
 			}
 		}
 	}

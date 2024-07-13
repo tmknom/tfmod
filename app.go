@@ -51,16 +51,16 @@ func (a *App) Run(args []string) error {
 	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.format, "format", "f", format.TextFormat, fmt.Sprintf("Format output by: {%s}", format.SupportType()))
 	a.rootCmd.PersistentFlags().BoolVar(&a.GlobalFlags.debug, "debug", false, "Show debugging output")
 
-	a.rootCmd.AddCommand(a.newGetCommand())
-	a.rootCmd.AddCommand(a.newDependenciesCommand())
-	a.rootCmd.AddCommand(a.newDependentsCommand())
+	a.rootCmd.AddCommand(a.newDownloadCommand())
+	a.rootCmd.AddCommand(a.newDependencyCommand())
+	a.rootCmd.AddCommand(a.newDependentCommand())
 
 	return a.rootCmd.Execute()
 }
 
-func (a *App) newGetCommand() *cobra.Command {
-	flags := NewGetFlags(a.GlobalFlags)
-	runner := NewGetRunner(flags, a.IO)
+func (a *App) newDownloadCommand() *cobra.Command {
+	flags := NewDownloadFlags(a.GlobalFlags)
+	runner := NewDownloadRunner(flags, a.IO)
 	command := &cobra.Command{
 		Use:   "download",
 		Short: "Download all modules at once under the base directory",
@@ -69,27 +69,27 @@ func (a *App) newGetCommand() *cobra.Command {
 	return command
 }
 
-func (a *App) newDependenciesCommand() *cobra.Command {
-	flags := NewDependenciesFlags(a.GlobalFlags)
-	runner := NewDependenciesRunner(flags, terraform.NewDependencyStore(), a.IO)
+func (a *App) newDependencyCommand() *cobra.Command {
+	flags := NewDependencyFlags(a.GlobalFlags)
+	runner := NewDependencyRunner(flags, terraform.NewDependencyStore(), a.IO)
 	command := &cobra.Command{
 		Use:   "dependency",
 		Short: "Explore the module directory it depends on",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
 	}
-	command.PersistentFlags().StringSliceVarP(&flags.StateDirs, "state", "s", []string{}, "Directory paths for the state to managed configuration")
+	command.PersistentFlags().StringSliceVarP(&flags.StatePaths, "state", "s", []string{}, "Directory paths for the state to managed configuration")
 	return command
 }
 
-func (a *App) newDependentsCommand() *cobra.Command {
-	flags := NewDependentsFlags(a.GlobalFlags)
-	runner := NewDependentsRunner(flags, terraform.NewDependentStore(), a.IO)
+func (a *App) newDependentCommand() *cobra.Command {
+	flags := NewDependentFlags(a.GlobalFlags)
+	runner := NewDependentRunner(flags, terraform.NewDependentStore(), a.IO)
 	command := &cobra.Command{
 		Use:   "dependent",
 		Short: "Explore how the state directory is used by specified modules",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
 	}
-	command.PersistentFlags().StringSliceVarP(&flags.ModuleDirs, "module", "m", []string{}, "File paths of the module sources")
+	command.PersistentFlags().StringSliceVarP(&flags.ModulePaths, "module", "m", []string{}, "File paths of the module sources")
 	return command
 }
 
@@ -127,7 +127,7 @@ type GlobalFlags struct {
 	debug  bool
 }
 
-func (f *GlobalFlags) GetBaseDir() *dir.BaseDir {
+func (f *GlobalFlags) BaseDir() *dir.BaseDir {
 	return dir.NewBaseDir(f.base)
 }
 

@@ -22,7 +22,7 @@ func NewParser(store ParserStore) *Parser {
 }
 
 type ParserStore interface {
-	Save(moduleDir *ModuleDir, tfDir *TfDir)
+	Save(moduleDir *ModuleDir, stateDir *StateDir)
 }
 
 func (p *Parser) ParseAll(sourceDirs []*dir.Dir) error {
@@ -38,7 +38,7 @@ func (p *Parser) ParseAll(sourceDirs []*dir.Dir) error {
 		}
 
 		for _, moduleDir := range moduleDirs {
-			p.ParserStore.Save(moduleDir, NewTfDir(sourceDir.Rel(), sourceDir.BaseDir()))
+			p.ParserStore.Save(moduleDir, NewStateDir(sourceDir.Rel(), sourceDir.BaseDir()))
 		}
 	}
 	return nil

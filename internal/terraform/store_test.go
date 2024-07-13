@@ -25,10 +25,10 @@ func TestDependencyStore_List(t *testing.T) {
 
 	baseDir := dir.NewBaseDir("testdata/terraform")
 	sut := NewDependencyStore()
-	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/dev", baseDir))
-	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/prd", baseDir))
-	sut.Save(NewModuleDir("module/bar", baseDir), NewTfDir("env/dev", baseDir))
-	sut.Save(NewModuleDir("module/baz", baseDir), NewTfDir("env/prd", baseDir))
+	sut.Save(NewModuleDir("module/foo", baseDir), NewStateDir("env/dev", baseDir))
+	sut.Save(NewModuleDir("module/foo", baseDir), NewStateDir("env/prd", baseDir))
+	sut.Save(NewModuleDir("module/bar", baseDir), NewStateDir("env/dev", baseDir))
+	sut.Save(NewModuleDir("module/baz", baseDir), NewStateDir("env/prd", baseDir))
 
 	for _, tc := range cases {
 		actual := sut.List(FactoryTestDirs(tc.input, baseDir))
@@ -56,11 +56,11 @@ func TestDependentStore_List(t *testing.T) {
 
 	baseDir := dir.NewBaseDir("testdata/terraform")
 	sut := NewDependentStore()
-	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/dev", baseDir))
-	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/prd", baseDir))
-	sut.Save(NewModuleDir("module/foo", baseDir), NewTfDir("env/stg", baseDir))
-	sut.Save(NewModuleDir("module/bar", baseDir), NewTfDir("env/dev", baseDir))
-	sut.Save(NewModuleDir("module/baz", baseDir), NewTfDir("env/prd", baseDir))
+	sut.Save(NewModuleDir("module/foo", baseDir), NewStateDir("env/dev", baseDir))
+	sut.Save(NewModuleDir("module/foo", baseDir), NewStateDir("env/prd", baseDir))
+	sut.Save(NewModuleDir("module/foo", baseDir), NewStateDir("env/stg", baseDir))
+	sut.Save(NewModuleDir("module/bar", baseDir), NewStateDir("env/dev", baseDir))
+	sut.Save(NewModuleDir("module/baz", baseDir), NewStateDir("env/prd", baseDir))
 
 	for _, tc := range cases {
 		actual := sut.List(FactoryTestDirs(tc.input, baseDir))

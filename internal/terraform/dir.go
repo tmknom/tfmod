@@ -14,23 +14,23 @@ func NewModuleDir(raw string, baseDir *dir.BaseDir) *ModuleDir {
 	}
 }
 
-type TfDir struct {
+type StateDir struct {
 	*dir.Dir
 }
 
-func NewTfDir(raw string, baseDir *dir.BaseDir) *TfDir {
-	return &TfDir{
+func NewStateDir(raw string, baseDir *dir.BaseDir) *StateDir {
+	return &StateDir{
 		Dir: baseDir.CreateDir(raw),
 	}
 }
 
 type DependentGraph struct {
-	*dir.Graph[ModuleDir, TfDir]
+	*dir.Graph[ModuleDir, StateDir]
 }
 
 func NewDependentGraph() *DependentGraph {
 	return &DependentGraph{
-		Graph: dir.NewGraph[ModuleDir, TfDir](),
+		Graph: dir.NewGraph[ModuleDir, StateDir](),
 	}
 }
 
@@ -39,11 +39,11 @@ func (m *DependentGraph) IsModule(src dir.Path) bool {
 }
 
 type DependencyGraph struct {
-	*dir.Graph[TfDir, ModuleDir]
+	*dir.Graph[StateDir, ModuleDir]
 }
 
 func NewDependencyGraph() *DependencyGraph {
 	return &DependencyGraph{
-		Graph: dir.NewGraph[TfDir, ModuleDir](),
+		Graph: dir.NewGraph[StateDir, ModuleDir](),
 	}
 }
