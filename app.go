@@ -85,8 +85,8 @@ func (a *App) newDependentsCommand() *cobra.Command {
 	flags := NewDependentsFlags(a.GlobalFlags)
 	runner := NewDependentsRunner(flags, terraform.NewDependentStore(), a.IO)
 	command := &cobra.Command{
-		Use:   "dependents",
-		Short: "List module dependents",
+		Use:   "dependent",
+		Short: "Explore how the state directory is used by specified modules",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
 	}
 	command.PersistentFlags().StringSliceVarP(&flags.ModuleDirs, "module", "m", []string{}, "File paths of the module sources")
