@@ -48,7 +48,7 @@ func TestApp_Run_Dependents(t *testing.T) {
 		expected string
 	}{
 		{
-			input:    []string{"dependents", "--module-dirs", "module/foo", "--base=testdata/terraform", "--format=text"},
+			input:    []string{"dependents", "--module", "module/foo", "--base=testdata/terraform", "--format=text"},
 			expected: "env/dev env/prd env/stg\n",
 		},
 	}

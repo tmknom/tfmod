@@ -89,7 +89,7 @@ func (a *App) newDependentsCommand() *cobra.Command {
 		Short: "List module dependents",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
 	}
-	command.PersistentFlags().StringSliceVarP(&flags.ModuleDirs, "module-dirs", "m", []string{}, "module dirs")
+	command.PersistentFlags().StringSliceVarP(&flags.ModuleDirs, "module", "m", []string{}, "File paths of the module sources")
 	return command
 }
 
