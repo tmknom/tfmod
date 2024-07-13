@@ -62,8 +62,8 @@ func (a *App) newGetCommand() *cobra.Command {
 	flags := NewGetFlags(a.GlobalFlags)
 	runner := NewGetRunner(flags, a.IO)
 	command := &cobra.Command{
-		Use:   "get",
-		Short: "Run terraform get",
+		Use:   "download",
+		Short: "Download all modules at once under the base directory",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run(cmd.Context()) },
 	}
 	return command
@@ -73,8 +73,8 @@ func (a *App) newDependenciesCommand() *cobra.Command {
 	flags := NewDependenciesFlags(a.GlobalFlags)
 	runner := NewDependenciesRunner(flags, terraform.NewDependencyStore(), a.IO)
 	command := &cobra.Command{
-		Use:   "dependencies",
-		Short: "List module dependencies",
+		Use:   "dependency",
+		Short: "Explore the module directory it depends on",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
 	}
 	command.PersistentFlags().StringSliceVarP(&flags.StateDirs, "state", "s", []string{}, "Directory paths for the state to managed configuration")
@@ -85,8 +85,8 @@ func (a *App) newDependentsCommand() *cobra.Command {
 	flags := NewDependentsFlags(a.GlobalFlags)
 	runner := NewDependentsRunner(flags, terraform.NewDependentStore(), a.IO)
 	command := &cobra.Command{
-		Use:   "dependents",
-		Short: "List module dependents",
+		Use:   "dependent",
+		Short: "Explore how the state directory is used by specified modules",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run() },
 	}
 	command.PersistentFlags().StringSliceVarP(&flags.ModuleDirs, "module", "m", []string{}, "File paths of the module sources")
