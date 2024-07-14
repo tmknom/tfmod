@@ -2,6 +2,7 @@ package tfmod
 
 import (
 	"bytes"
+	"context"
 	"os"
 	"testing"
 
@@ -25,7 +26,7 @@ func TestApp_Run_Dependency(t *testing.T) {
 
 	for _, tc := range cases {
 		sut := NewApp(&IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}, &Ldflags{})
-		err := sut.Run(tc.input)
+		err := sut.Run(context.Background(), tc.input)
 
 		if err != nil {
 			t.Fatalf(testlib.FormatError(err, sut, tc.input))
@@ -55,7 +56,7 @@ func TestApp_Run_Dependent(t *testing.T) {
 
 	for _, tc := range cases {
 		sut := NewApp(&IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}, &Ldflags{})
-		err := sut.Run(tc.input)
+		err := sut.Run(context.Background(), tc.input)
 
 		if err != nil {
 			t.Fatalf(testlib.FormatError(err, sut, tc.input))

@@ -44,9 +44,8 @@ func NewApp(io *IO, ldflags *Ldflags) *App {
 	}
 }
 
-func (a *App) Run(args []string) error {
-	a.prepareCommand(args)
-	a.rootCmd.SetContext(context.Background())
+func (a *App) Run(ctx context.Context, args []string) error {
+	a.prepareCommand(ctx, args)
 
 	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.base, "base", "b", ".", "The base directory that contains tf files")
 	a.rootCmd.PersistentFlags().StringVarP(&a.GlobalFlags.format, "format", "f", format.TextFormat, fmt.Sprintf("Format output by: {%s}", format.SupportType()))
@@ -94,8 +93,10 @@ func (a *App) newDependentCommand() *cobra.Command {
 	return command
 }
 
-func (a *App) prepareCommand(args []string) {
-	// set ldflags
+func (a *App) prepareCommand(ctx context.Context, args []string) {
+	a.rootCmd.SetContext(ctx)
+
+	// setup help message
 	a.rootCmd.Use = a.Ldflags.Name
 	a.rootCmd.Version = a.Ldflags.Version
 
