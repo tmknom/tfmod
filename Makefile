@@ -4,13 +4,14 @@
 	@git clone https://github.com/tmknom/makefiles.git .makefiles >/dev/null 2>&1
 
 # Variables: Go
-NAME = $(shell \basename $(ROOT_DIR))
+REPO_ORIGIN ?= $(shell \git config --get remote.origin.url)
+REPO_NAME = $(shell \basename -s .git $(REPO_ORIGIN))
+REPO_OWNER = $(shell \gh config get -h github.com user)
 VERSION = $(shell \git tag --sort=-v:refname | head -1)
-OWNER = $(shell \gh config get -h github.com user)
 COMMIT = $(shell \git rev-parse HEAD)
 DATE = $(shell \date +"%Y-%m-%d")
-URL = https://github.com/$(OWNER)/$(NAME)/releases/tag/$(VERSION)
-LDFLAGS ?= "-X main.name=$(NAME) -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.date=$(DATE) -X main.url=$(URL)"
+URL = https://github.com/$(REPO_OWNER)/$(REPO_NAME)/releases/tag/$(VERSION)
+LDFLAGS ?= "-X main.name=$(REPO_NAME) -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.date=$(DATE) -X main.url=$(URL)"
 
 # Targets: Go
 .PHONY: all
@@ -27,11 +28,11 @@ deps:
 
 .PHONY: build
 build: deps ## build executable binary
-	go build -ldflags=$(LDFLAGS) -o bin/$(NAME) ./cmd/$(NAME)
+	go build -ldflags=$(LDFLAGS) -o bin/$(REPO_NAME) ./cmd/$(REPO_NAME)
 
 .PHONY: install
 install: deps ## install
-	go install -ldflags=$(LDFLAGS) ./cmd/$(NAME)
+	go install -ldflags=$(LDFLAGS) ./cmd/$(REPO_NAME)
 
 .PHONY: run
 run: build ## run command
