@@ -1,10 +1,11 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 
-	"github.com/tmknom/tfmod"
+	cli "github.com/tmknom/tfmod"
 )
 
 // Specify explicitly in ldflags
@@ -18,20 +19,19 @@ var (
 )
 
 func main() {
-	app := createApp()
-	if err := app.Run(os.Args[1:]); err != nil {
+	if err := run(); err != nil {
 		log.Fatalf("%+v", err)
 	}
 }
 
-func createApp() *tfmod.App {
-	io := &tfmod.IO{
+func run() error {
+	io := &cli.IO{
 		InReader:  os.Stdin,
 		OutWriter: os.Stdout,
 		ErrWriter: os.Stderr,
 	}
 
-	ldflags := &tfmod.Ldflags{
+	ldflags := &cli.Ldflags{
 		Name:    name,
 		Version: version,
 		Commit:  commit,
@@ -39,5 +39,7 @@ func createApp() *tfmod.App {
 		Url:     url,
 	}
 
-	return tfmod.NewApp(io, ldflags)
+	ctx := context.Background()
+
+	return cli.NewApp(io, ldflags).Run(ctx, os.Args[1:])
 }
