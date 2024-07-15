@@ -27,6 +27,10 @@ func NewCommand(maxConcurrent int) *Command {
 type token struct{}
 
 func (c *Command) GetAll(ctx context.Context, workDirs []*dir.Dir) error {
+	if c.maxConcurrent < 1 {
+		return errlib.Wrapf(fmt.Errorf("invalid flag"), "max-concurrent must greater than zero: %d", c.maxConcurrent)
+	}
+
 	var wg sync.WaitGroup
 	wg.Add(len(workDirs))
 
