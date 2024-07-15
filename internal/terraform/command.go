@@ -14,19 +14,27 @@ import (
 	"github.com/tmknom/tfmod/internal/errlib"
 )
 
-type Command struct{}
+type Command struct {
+	maxConcurrent int
+}
 
-func NewCommand() *Command {
-	return &Command{}
+func NewCommand(maxConcurrent int) *Command {
+	return &Command{
+		maxConcurrent: maxConcurrent,
+	}
 }
 
 type token struct{}
 
 func (c *Command) GetAll(ctx context.Context, workDirs []*dir.Dir) error {
+	if c.maxConcurrent < 1 {
+		return errlib.Wrapf(fmt.Errorf("invalid flag"), "max-concurrent must greater than zero: %d", c.maxConcurrent)
+	}
+
 	var wg sync.WaitGroup
 	wg.Add(len(workDirs))
 
-	sem := make(chan token, maxConcurrentJobs)
+	sem := make(chan token, c.maxConcurrent)
 	resultCh := make(chan string, len(workDirs))
 	errCh := make(chan error, len(workDirs))
 	for _, arg := range workDirs {

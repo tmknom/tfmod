@@ -66,6 +66,7 @@ func (a *App) newDownloadCommand() *cobra.Command {
 		Short: "Download all modules at once under the base directory",
 		RunE:  func(cmd *cobra.Command, args []string) error { return runner.Run(cmd.Context()) },
 	}
+	command.PersistentFlags().IntVar(&flags.MaxConcurrent, "max-concurrent", defaultMaxConcurrent, "Maximum number of concurrency for terraform get")
 	return command
 }
 

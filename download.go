@@ -22,6 +22,7 @@ func NewDownloadRunner(flags *DownloadFlags, io *IO) *DownloadRunner {
 }
 
 type DownloadFlags struct {
+	MaxConcurrent int
 	*GlobalFlags
 }
 
@@ -30,6 +31,8 @@ func NewDownloadFlags(globalFlags *GlobalFlags) *DownloadFlags {
 		GlobalFlags: globalFlags,
 	}
 }
+
+const defaultMaxConcurrent = 8
 
 func (f *DownloadFlags) GoString() string {
 	return fmt.Sprintf("%#v", *f)
@@ -52,7 +55,7 @@ func (r *DownloadRunner) TerraformGet(ctx context.Context) ([]string, error) {
 		return nil, err
 	}
 
-	terraformCommand := terraform.NewCommand()
+	terraformCommand := terraform.NewCommand(r.flags.MaxConcurrent)
 	err = terraformCommand.GetAll(ctx, sourceDirs)
 	if err != nil {
 		return nil, err

@@ -23,7 +23,7 @@ func TestTerraform_GetAll(t *testing.T) {
 
 	baseDir := dir.NewBaseDir("../../testdata/terraform/env")
 	for _, tc := range cases {
-		sut := NewCommand()
+		sut := NewCommand(testMaxConcurrent)
 
 		err := sut.GetAll(context.Background(), FactoryTestDirs(tc.input, baseDir))
 		if err != nil {
@@ -31,3 +31,5 @@ func TestTerraform_GetAll(t *testing.T) {
 		}
 	}
 }
+
+const testMaxConcurrent = 8
