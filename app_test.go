@@ -9,6 +9,36 @@ import (
 	"github.com/tmknom/tfmod/internal/testlib"
 )
 
+func TestApp_Run_Download(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	cases := []struct {
+		input    []string
+		expected string
+	}{
+		{
+			input:    []string{"download", "--base=testdata/terraform/env"},
+			expected: "dev prd stg\n",
+		},
+	}
+
+	for _, tc := range cases {
+		sut := NewApp(&IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}, &Ldflags{})
+		err := sut.Run(context.Background(), tc.input)
+
+		if err != nil {
+			t.Fatalf(testlib.FormatError(err, sut, tc.input))
+		}
+
+		actual := sut.IO.OutWriter.(*bytes.Buffer).String()
+		if actual != tc.expected {
+			t.Errorf(testlib.Format(sut, tc.expected, actual, tc.input))
+		}
+	}
+}
+
 func TestApp_Run_Dependency(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
