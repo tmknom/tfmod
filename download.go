@@ -52,7 +52,7 @@ func (r *DownloadRunner) TerraformGet(ctx context.Context) ([]string, error) {
 		return nil, err
 	}
 
-	terraformCommand := terraform.NewCommand()
+	terraformCommand := terraform.NewCommand(8)
 	err = terraformCommand.GetAll(ctx, sourceDirs)
 	if err != nil {
 		return nil, err
