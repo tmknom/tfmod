@@ -10,7 +10,7 @@ import (
 	"github.com/tmknom/tfmod/internal/testlib"
 )
 
-func TestGetRunner_List(t *testing.T) {
+func TestDownloadRunner_TerraformGet(t *testing.T) {
 	cases := []struct {
 		input    string
 		expected []string
