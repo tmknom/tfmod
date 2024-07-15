@@ -19,7 +19,7 @@ func TestApp_Run(t *testing.T) {
 		expected string
 	}{
 		{
-			input:    []string{"download", "--base=testdata/terraform/env"},
+			input:    []string{"download", "--base=testdata/terraform/env", "--max-concurrent=4"},
 			expected: "dev prd stg\n",
 		},
 		{
