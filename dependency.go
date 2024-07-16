@@ -63,6 +63,11 @@ func (r *DependencyRunner) List() ([]string, error) {
 
 	r.Store.Dump()
 
+	if r.IO.IsPipe() {
+		r.flags.StatePaths = r.IO.Read()
+	}
+	log.Printf("Candidate paths: %#v", r.flags.StatePaths)
+
 	stateDirs, err := baseDir.FilterDirs(r.flags.StatePaths)
 	if err != nil {
 		return nil, err
