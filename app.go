@@ -138,7 +138,7 @@ func (a *App) prepareCommand(ctx context.Context, args []string) {
 func (a *App) setupLog(args []string) {
 	log.SetOutput(io.Discard)
 	if a.GlobalFlags.debug {
-		log.SetOutput(a.IO.OutWriter)
+		log.SetOutput(a.IO.ErrWriter)
 	}
 	log.SetPrefix(fmt.Sprintf("[%s] ", a.Ldflags.Name))
 	log.Printf("Start: args: %v, ldflags: %+v", args, a.Ldflags)
