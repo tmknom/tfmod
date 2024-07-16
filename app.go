@@ -1,10 +1,13 @@
 package tfmod
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/tmknom/tfmod/internal/dir"
@@ -16,6 +19,23 @@ type IO struct {
 	InReader  io.Reader
 	OutWriter io.Writer
 	ErrWriter io.Writer
+}
+
+func (i *IO) Read() []string {
+	lines := make([]string, 0, 64)
+	scanner := bufio.NewScanner(i.InReader)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines
+}
+
+func (i *IO) IsPipe() bool {
+	stat, err := i.InReader.(fs.File).Stat()
+	if err != nil {
+		return false
+	}
+	return (stat.Mode() & os.ModeCharDevice) == 0
 }
 
 type Ldflags struct {
