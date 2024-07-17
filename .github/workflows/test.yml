@@ -1,0 +1,44 @@
+name: Test
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ["*.go", ".github/workflows/test.yml"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: tmknom/checkout-action@v1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build
+        run: |
+          set -x
+          make build
+          bin/tfmod download --base="${GITHUB_WORKSPACE}" --format=json --debug | jq .
+
+      - name: Run test
+        run: |
+          set -x
+          go test -race -shuffle=on ./...
