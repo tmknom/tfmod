@@ -51,7 +51,7 @@ jobs:
           bump-level: ${{ inputs.level }}
 
       - name: Push Version Tag
-        uses: tmknom/push-version-tag-action@df291accb571c602bfff8f12ccf08f11fa72d76a # v0.1.0
+        uses: tmknom/push-version-tag-action@a9d1b46f9c29d3db510771452257b228bfd8a33f # v0.1.1
         with:
           version: ${{ steps.bump.outputs.version }}
 
