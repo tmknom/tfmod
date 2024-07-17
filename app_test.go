@@ -33,7 +33,7 @@ func TestApp_Run(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		sut := NewApp(&IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}, &Ldflags{})
+		sut := NewApp(&IO{InReader: &bytes.Buffer{}, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}, &Ldflags{})
 		err := sut.Run(context.Background(), tc.input)
 
 		if err != nil {
