@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/fs"
 	"log"
 	"os"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/tmknom/tfmod/internal/dir"
 	"github.com/tmknom/tfmod/internal/format"
 	"github.com/tmknom/tfmod/internal/terraform"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 type IO struct {
@@ -31,11 +31,11 @@ func (i *IO) Read() []string {
 }
 
 func (i *IO) IsPipe() bool {
-	stat, err := i.InReader.(fs.File).Stat()
-	if err != nil {
+	f, ok := i.InReader.(*os.File)
+	if !ok {
 		return false
 	}
-	return (stat.Mode() & os.ModeCharDevice) == 0
+	return !terminal.IsTerminal(int(f.Fd()))
 }
 
 type Ldflags struct {
