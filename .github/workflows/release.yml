@@ -46,7 +46,7 @@ jobs:
 
       - name: Bump Version
         id: bump
-        uses: tmknom/bump-version-action@5359840c1431ddf51358165b08adbcf719aa12d4 # v0.2.0
+        uses: tmknom/bump-version-action@87bed7f224292cab5b46a4cae9897bbf64153f00 # v0.2.1
         with:
           bump-level: ${{ inputs.level }}
 
