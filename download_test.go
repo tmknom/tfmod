@@ -22,7 +22,7 @@ func TestDownloadRunner_TerraformGet(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		bufIO := &IO{InReader: os.Stdin, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}
+		bufIO := &IO{InReader: &bytes.Buffer{}, OutWriter: &bytes.Buffer{}, ErrWriter: os.Stderr}
 		flags := &DownloadFlags{
 			MaxConcurrent: 8,
 			GlobalFlags: &GlobalFlags{
