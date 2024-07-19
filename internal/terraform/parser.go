@@ -29,7 +29,7 @@ func (p *Parser) ParseAll(sourceDirs []*dir.Dir) error {
 	for _, sourceDir := range sourceDirs {
 		raw, err := os.ReadFile(filepath.Join(sourceDir.Abs(), ModulesJsonPath))
 		if err != nil {
-			return errlib.Wrapf(err, "not readfile")
+			continue
 		}
 
 		moduleDirs, err := p.Parse(sourceDir, raw)
